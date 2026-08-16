@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Figure {
+  id            String   @id @default(cuid())
+  nome          String
+  personagem    String
+  linha         String?
+  escala        String
+  estilo        String
+  alinhamento   String
+  tipo          String
+  status        String
+  precoEstimado Float?
+  faixaPreco    String
+  link          String?
+  imagemUrl     String?
+  // Miniatura gerada no upload; a imagem cheia só é servida no detalhe/lightbox.
+  thumbUrl      String?
+  observacoes   String?
+  // Data simples da última conferência de preço (não é histórico de preço).
+  precoConferidoEm DateTime?
+  // Soft delete: exclusão vai pra "lixeira" e pode ser desfeita. Toda leitura
+  // filtra por `deletedAt: null` — ver notDeleted() em lib/queries.ts.
+  deletedAt     DateTime?
+  marcaId       String
+  marca         Marca      @relation(fields: [marcaId], references: [id])
+  grupoId       String
+  grupo         Grupo      @relation(fields: [grupoId], references: [id])
+  conjuntos     Conjunto[]
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+}
+
+model Marca {
+  id      String   @id @default(cuid())
+  nome    String   @unique
+  corBg   String
+  corFg   String
+  ordem   Int      @default(0)
+  figures Figure[]
+}
+
+model Grupo {
+  id      String   @id @default(cuid())
+  nome    String   @unique
+  corBg   String
+  corFg   String
+  ordem   Int      @default(0)
+  figures Figure[]
+}
+
+// Agrupamento pessoal dentro da Coleção: uma figura pode pertencer a vários
+// conjuntos (ex: "Display da estante", "Diorama Homem-Aranha"), diferente do
+// campo Grupo (afiliação única, ex: Avengers/X-Men).
+model Conjunto {
+  id      String   @id @default(cuid())
+  nome    String   @unique
+  corBg   String
+  corFg   String
+  ordem   Int      @default(0)
+  figures Figure[]
+}
+
+// Listas simples configuraveis: escala, estilo, alinhamento, tipo, status, faixaPreco
+model Option {
+  id        String @id @default(cuid())
+  categoria String
+  valor     String
+  corBg     String
+  corFg     String
+  ordem     Int    @default(0)
+
+  @@unique([categoria, valor])
+}
