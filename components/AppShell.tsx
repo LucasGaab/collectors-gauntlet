@@ -51,14 +51,16 @@ export function AppShell({
     });
   }
 
-  const sidebarWidth = collapsed ? "w-20" : "w-20 lg:w-64";
-  const mainPadding = collapsed ? "pl-20" : "pl-20 lg:pl-64";
+  // No celular a sidebar dá lugar a uma navbar inferior: 80px fixos de menu
+  // lateral comem 21% de uma tela de 375px.
+  const sidebarWidth = collapsed ? "md:w-20" : "md:w-20 lg:w-64";
+  const mainPadding = collapsed ? "md:pl-20" : "md:pl-20 lg:pl-64";
   const showLabels = !collapsed;
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       <aside
-        className={`fixed left-0 top-0 z-40 flex h-full ${sidebarWidth} flex-col border-r border-border bg-surface transition-[width] duration-200`}
+        className={`fixed left-0 top-0 z-40 hidden h-full md:flex ${sidebarWidth} flex-col border-r border-border bg-surface transition-[width] duration-200`}
       >
         <div className="flex items-center justify-between gap-2 p-6">
           <Link href="/" className="flex min-w-0 items-center gap-3">
@@ -121,16 +123,39 @@ export function AppShell({
         )}
       </aside>
 
-      <main className={`${mainPadding} transition-[padding] duration-200`}>
-        <header className="sticky top-0 z-30 flex h-20 items-center justify-between gap-6 border-b border-border bg-background/70 px-8 backdrop-blur-md">
+      {/* Navbar inferior — só no mobile. pb com safe-area pro indicador do iPhone. */}
+      <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
+        {NAV.map(({ to, label, icon: Icon }) => {
+          const active = to === "/" ? pathname === "/" : pathname.startsWith(to);
+          return (
+            <Link
+              key={to}
+              href={to}
+              className={
+                "flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors " +
+                (active ? "text-primary" : "text-muted-foreground")
+              }
+            >
+              <Icon className="size-5" strokeWidth={2} />
+              <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* pb-20 reserva espaço pra navbar; no desktop ela não existe. */}
+      <main className={`${mainPadding} pb-20 transition-[padding] duration-200 md:pb-0`}>
+        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-background/70 px-4 backdrop-blur-md md:h-20 md:gap-6 md:px-8">
           <div className="min-w-0">
-            <h1 className="display-title truncate text-2xl">{title}</h1>
-            {subtitle ? <p className="truncate text-xs text-muted-foreground">{subtitle}</p> : null}
+            <h1 className="display-title truncate text-lg md:text-2xl">{title}</h1>
+            {subtitle ? (
+              <p className="hidden truncate text-xs text-muted-foreground sm:block">{subtitle}</p>
+            ) : null}
           </div>
-          <div className="flex items-center gap-3">{actions}</div>
+          <div className="flex shrink-0 items-center gap-3">{actions}</div>
         </header>
 
-        <div className="mx-auto max-w-[1800px] space-y-8 p-6">{children}</div>
+        <div className="mx-auto max-w-[1800px] space-y-6 p-4 md:space-y-8 md:p-6">{children}</div>
       </main>
     </div>
   );

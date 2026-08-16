@@ -77,7 +77,7 @@ export function Modal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.15, ease: "easeOut" }}
-      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/70 p-4 py-10 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-black/70 p-2 py-4 backdrop-blur-sm sm:items-center sm:p-4 sm:py-10"
       onClick={(e) => {
         if (e.target === e.currentTarget) close();
       }}
@@ -94,7 +94,9 @@ export function Modal({
 
       {index >= 0 && navIds.length > 1 && (
         <>
-          <div className="fixed left-4 top-1/2 z-10 -translate-y-1/2">
+          {/* Setas laterais só a partir de sm: no celular o modal ocupa quase
+              toda a largura e elas ficariam por cima do conteúdo. */}
+          <div className="fixed left-4 top-1/2 z-10 hidden -translate-y-1/2 sm:block">
             <button
               type="button"
               onClick={() => goTo(prevId)}
@@ -106,7 +108,7 @@ export function Modal({
               <ChevronLeft className="size-5" />
             </button>
           </div>
-          <div className="fixed right-4 top-1/2 z-10 -translate-y-1/2">
+          <div className="fixed right-4 top-1/2 z-10 hidden -translate-y-1/2 sm:block">
             <button
               type="button"
               onClick={() => goTo(nextId)}
@@ -118,9 +120,32 @@ export function Modal({
               <ChevronRight className="size-5" />
             </button>
           </div>
-          <span className="fixed bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-border bg-surface/90 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground backdrop-blur">
-            {index + 1} / {navIds.length} · ← →
-          </span>
+
+          {/* No mobile a navegação vive na pílula inferior, com alvos de toque. */}
+          <div className="fixed bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-border bg-surface/95 px-2 py-1 backdrop-blur sm:gap-0 sm:px-3">
+            <button
+              type="button"
+              onClick={() => goTo(prevId)}
+              disabled={!prevId}
+              aria-label="Peça anterior"
+              className="grid size-8 place-items-center rounded-full text-foreground transition-colors disabled:opacity-25 sm:hidden"
+            >
+              <ChevronLeft className="size-4" />
+            </button>
+            <span className="whitespace-nowrap px-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              {index + 1} / {navIds.length}
+              <span className="hidden sm:inline"> · ← →</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => goTo(nextId)}
+              disabled={!nextId}
+              aria-label="Próxima peça"
+              className="grid size-8 place-items-center rounded-full text-foreground transition-colors disabled:opacity-25 sm:hidden"
+            >
+              <ChevronRight className="size-4" />
+            </button>
+          </div>
         </>
       )}
     </motion.div>

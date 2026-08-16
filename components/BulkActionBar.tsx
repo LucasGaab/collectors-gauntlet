@@ -52,7 +52,9 @@ export function BulkActionBar({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.18, ease: "easeOut" }}
-      className="fixed bottom-6 left-1/2 z-50 flex -translate-x-1/2 items-center gap-4 rounded-full border border-border bg-surface-high px-5 py-3 shadow-card-hover"
+      // No mobile: acima da navbar inferior, ocupando a largura com quebra de
+      // linha (em linha única a barra passaria de 375px).
+      className="fixed bottom-24 left-1/2 z-50 flex w-[calc(100vw-1.5rem)] -translate-x-1/2 flex-wrap items-center justify-center gap-2 rounded-2xl border border-border bg-surface-high px-4 py-3 shadow-card-hover md:bottom-6 md:w-auto md:flex-nowrap md:gap-4 md:rounded-full md:px-5"
     >
       <span className="text-[10px] font-bold uppercase tracking-widest text-foreground">
         {count} selecionada{count === 1 ? "" : "s"}

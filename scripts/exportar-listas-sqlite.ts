@@ -8,6 +8,8 @@
  * para Postgres e não consegue mais abrir o arquivo antigo. Script de migração
  * pontual — pode ser apagado depois que a transição terminar.
  */
+// @ts-expect-error `node:sqlite` existe no runtime (Node 22+) mas ainda não tem
+// tipos no @types/node 20 usado pelo projeto.
 import { DatabaseSync } from "node:sqlite";
 
 const file = process.argv[2] ?? "prisma/dev.db";

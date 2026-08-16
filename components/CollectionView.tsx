@@ -97,9 +97,11 @@ export async function CollectionView({
       actions={
         <Link
           href="/nova"
-          className="flex items-center gap-2 rounded-full bg-primary px-6 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-all duration-200 hover:scale-105 hover:bg-primary-hover"
+          aria-label="Nova figura"
+          // No mobile vira só o "+": o rótulo completo não cabe ao lado do título.
+          className="flex items-center gap-2 rounded-full bg-primary px-3 py-2 text-xs font-bold uppercase tracking-widest text-primary-foreground transition-all duration-200 hover:scale-105 hover:bg-primary-hover sm:px-6"
         >
-          <Plus className="size-4" /> Nova figura
+          <Plus className="size-4" /> <span className="hidden sm:inline">Nova figura</span>
         </Link>
       }
     >

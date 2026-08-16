@@ -127,6 +127,15 @@
   }
 }
 
+/* Faixa rolável sem barra visível (linha de filtros no mobile). */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility glass-card {
   background: linear-gradient(
     145deg,
