@@ -3,8 +3,22 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
+  // Conexão com pool (pgbouncer) — é a que a aplicação usa em serverless.
   url      = env("DATABASE_URL")
+  // Conexão direta, exigida pelas migrations (que não funcionam via pgbouncer).
+  directUrl = env("DIRECT_URL")
+}
+
+/// Imagem de uma peça, guardada no próprio banco em vez de no filesystem
+/// (serverless não tem disco persistente). Fica numa tabela separada de propósito:
+/// assim listar figuras nunca traz os bytes junto. As figuras referenciam a
+/// imagem pela URL `/api/imagem/<id>`, servida por app/api/imagem/[id]/route.ts.
+model Imagem {
+  id        String   @id @default(cuid())
+  mimeType  String
+  data      Bytes
+  createdAt DateTime @default(now())
 }
 
 model Figure {

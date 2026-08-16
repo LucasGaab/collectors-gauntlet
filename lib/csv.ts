@@ -80,6 +80,7 @@ export const CSV_COLUMNS = [
   "precoConferidoEm",
   "link",
   "imagemUrl",
+  "thumbUrl",
   "observacoes",
 ] as const;
 

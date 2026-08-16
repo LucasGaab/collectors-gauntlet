@@ -134,6 +134,9 @@ export function FigureTable({
                       alt={f.nome}
                       fill
                       sizes="40px"
+                      // Já servimos a miniatura de 320px gerada no upload; passar
+                      // pelo otimizador da Vercel só gastaria cota à toa.
+                      unoptimized
                       className="object-cover"
                     />
                   ) : (

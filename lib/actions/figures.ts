@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { WISHLIST_STATUSES, NOT_DELETED } from "@/lib/queries";
-import { saveImage, deleteImagesIfLocal, copyImageFiles } from "@/lib/images";
+import { saveImage, deleteImagesIfStored, copyImageFiles } from "@/lib/images";
 
 /** Peças na lixeira só são apagadas de vez (com as imagens) depois disso. */
 const TRASH_TTL_MS = 24 * 60 * 60 * 1000;
@@ -90,12 +90,12 @@ export async function updateFigure(id: string, formData: FormData) {
   let imagemUrl = existing.imagemUrl;
   let thumbUrl = existing.thumbUrl;
   if (imageFile && imageFile.size > 0) {
-    await deleteImagesIfLocal(existing.imagemUrl, existing.thumbUrl);
+    await deleteImagesIfStored(existing.imagemUrl, existing.thumbUrl);
     const image = await saveImage(imageFile);
     imagemUrl = image.imagemUrl;
     thumbUrl = image.thumbUrl;
   } else if (removeImage) {
-    await deleteImagesIfLocal(existing.imagemUrl, existing.thumbUrl);
+    await deleteImagesIfStored(existing.imagemUrl, existing.thumbUrl);
     imagemUrl = null;
     thumbUrl = null;
   }
@@ -141,7 +141,7 @@ async function purgeExpiredTrash() {
   if (expired.length === 0) return;
 
   await prisma.figure.deleteMany({ where: { id: { in: expired.map((f) => f.id) } } });
-  await Promise.all(expired.map((f) => deleteImagesIfLocal(f.imagemUrl, f.thumbUrl)));
+  await Promise.all(expired.map((f) => deleteImagesIfStored(f.imagemUrl, f.thumbUrl)));
 }
 
 /**

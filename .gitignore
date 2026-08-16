@@ -32,6 +32,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
 
 # vercel
 .vercel
@@ -40,10 +41,13 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# prisma sqlite database
+# prisma sqlite database (legado — o banco agora é Postgres/Neon)
 /prisma/dev.db
 /prisma/dev.db-journal
 
-# uploaded figure images (local only)
+# uploads antigos em disco (legado — as imagens agora ficam na tabela Imagem)
 /public/uploads/*
 !/public/uploads/.gitkeep
+
+# backups locais de dados (nao versionar)
+/backup-*.csv

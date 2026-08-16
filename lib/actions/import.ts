@@ -32,6 +32,17 @@ function parseNumber(v: string): number | null {
   return Number.isNaN(n) ? null : n;
 }
 
+/**
+ * URLs de imagem do formato antigo (`/uploads/...`, quando as fotos moravam no
+ * filesystem) não existem mais depois da migração pro banco. Importar esse texto
+ * cru só produziria imagem quebrada — melhor deixar sem foto e reenviar pela UI.
+ */
+function imageUrlOrNull(v: string): string | null {
+  const url = v.trim();
+  if (!url || url.startsWith("/uploads/")) return null;
+  return url;
+}
+
 function parseDate(v: string): Date | null {
   if (!v) return null;
   const d = new Date(`${v.slice(0, 10)}T00:00:00`);
@@ -160,7 +171,8 @@ export async function importFiguresCsv(formData: FormData): Promise<ImportResult
         faixaPreco: rec.faixaPreco?.trim() || "",
         precoConferidoEm: parseDate(rec.precoConferidoEm ?? ""),
         link: rec.link?.trim() || null,
-        imagemUrl: rec.imagemUrl?.trim() || null,
+        imagemUrl: imageUrlOrNull(rec.imagemUrl ?? ""),
+        thumbUrl: imageUrlOrNull(rec.thumbUrl ?? ""),
         observacoes: rec.observacoes?.trim() || null,
         marcaId,
         grupoId,

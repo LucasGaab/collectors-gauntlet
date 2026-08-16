@@ -10,21 +10,52 @@ Aplicação web pessoal e local para controlar uma coleção de action figures
 ## Stack
 
 - Next.js 16 (App Router, Turbopack) + TypeScript
-- SQLite via Prisma ORM (arquivo único `prisma/dev.db`)
+- PostgreSQL via Prisma ORM (Neon no deploy)
 - Tailwind CSS v4 + Framer Motion
 - Recharts (gráficos do dashboard)
-- Upload de imagem reencodado com `sharp` (WebP + thumbnail) em `/public/uploads`
+- Upload de imagem reencodado com `sharp` (WebP + thumbnail), guardado no banco
 
 ## Como rodar
 
+O banco é **PostgreSQL** (local ou Neon). Copie `.env.example` para `.env` e
+preencha `DATABASE_URL` e `DIRECT_URL` antes do primeiro comando.
+
 ```bash
 npm install
-npx prisma migrate dev
+npx prisma migrate deploy
 npx prisma db seed
 npm run dev
 ```
 
 Abra [http://localhost:3000](http://localhost:3000).
+
+## Deploy (Vercel + Neon)
+
+Tudo em free tier. As imagens ficam no próprio banco (tabela `Imagem`, servida
+por `/api/imagem/[id]`) porque serverless não tem disco persistente — gravar em
+`public/uploads` perderia as fotos a cada deploy.
+
+1. **Neon** — crie um projeto e copie as duas connection strings:
+   `DATABASE_URL` é a **com pool** (host termina em `-pooler`), usada pela
+   aplicação; `DIRECT_URL` é a **sem pool**, usada só pelas migrations.
+2. **Migrations** — com as duas variáveis no `.env` local:
+   ```bash
+   npx prisma migrate deploy
+   npx prisma db seed   # opcional: popula listas auxiliares + figuras de exemplo
+   ```
+3. **Vercel** — importe o repositório e cadastre `DATABASE_URL` e `DIRECT_URL`
+   nas Environment Variables. O `postinstall` já roda `prisma generate`.
+4. **Dados existentes** — exporte o CSV em `/listas` no ambiente antigo e
+   importe no novo. As fotos precisam ser reenviadas pela UI: URLs antigas no
+   formato `/uploads/...` são descartadas na importação, já que aqueles arquivos
+   não existem mais.
+
+> O free tier da Neon suspende o banco após alguns minutos ocioso, então a
+> primeira visita depois de um tempo parado demora alguns segundos. Como todas
+> as páginas são `force-dynamic`, isso aparece na navegação.
+
+> **Atenção:** o app não tem autenticação. Publicado, qualquer pessoa com o link
+> pode editar e excluir peças. Mantenha o backup CSV em dia.
 
 O comando de seed popula o banco com as listas auxiliares (Marca, Grupo, Escala,
 Estilo, Alinhamento, Tipo, Status, Faixa de Preço) e as 30 figuras definidas em
@@ -76,11 +107,11 @@ Estilo, Alinhamento, Tipo, Status, Faixa de Preço) e as 30 figuras definidas em
 ## Estrutura
 
 - `prisma/schema.prisma` — modelo de dados (`Figure`, `Marca`, `Grupo`,
-  `Conjunto`, `Option`)
+  `Conjunto`, `Option`, `Imagem`)
 - `prisma/seed.ts` — script de seed
 - `lib/actions/` — server actions (CRUD, lote, duplicação, importação CSV)
 - `lib/queries.ts` — helpers de filtro/ordenação e o filtro `NOT_DELETED`
-- `lib/images.ts` — reencode/thumbnail de upload
+- `lib/images.ts` — reencode/thumbnail de upload e persistência na tabela `Imagem`
 - `lib/csv.ts` — serialização/parse do CSV de backup
 - `components/` — UI (tabela, grid, formulário, badges, filtros, gráficos)
 - `app/` — rotas (App Router)

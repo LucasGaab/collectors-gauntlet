@@ -159,6 +159,7 @@ export function FigureDetail({
                       alt={figure.nome}
                       fill
                       sizes="(max-width: 1024px) 100vw, 300px"
+                      unoptimized
                       className="object-cover"
                     />
                     <Lightbox src={figure.imagemUrl} alt={figure.nome} />

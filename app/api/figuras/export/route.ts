@@ -32,6 +32,7 @@ export async function GET() {
       f.precoConferidoEm ? f.precoConferidoEm.toISOString().slice(0, 10) : "",
       f.link ?? "",
       f.imagemUrl ?? "",
+      f.thumbUrl ?? "",
       f.observacoes ?? "",
     ]),
   ];

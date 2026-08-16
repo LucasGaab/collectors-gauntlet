@@ -64,7 +64,15 @@ export function Lightbox({ src, alt }: { src: string; alt: string }) {
                   transition={{ duration: 0.18, ease: "easeOut" }}
                   className="relative h-full w-full"
                 >
-                  <Image src={src} alt={alt} fill sizes="100vw" className="object-contain" priority />
+                  <Image
+                    src={src}
+                    alt={alt}
+                    fill
+                    sizes="100vw"
+                    unoptimized
+                    className="object-contain"
+                    priority
+                  />
                 </motion.div>
                 <button
                   type="button"
