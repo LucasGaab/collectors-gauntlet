@@ -20,12 +20,14 @@ export function CollectionBody({
   optionColors,
   searchParamsString,
   statuses,
+  classeGrid,
 }: {
   figures: FigureRow[];
   view: "table" | "grid";
   optionColors: OptionColorMap;
   searchParamsString: string;
   statuses: { id: string; valor: string }[];
+  classeGrid?: string;
 }) {
   const [selected, setSelected] = useState<string[]>([]);
   const [comparando, setComparando] = useState(false);
@@ -75,6 +77,7 @@ export function CollectionBody({
             optionColors={optionColors}
             selected={visibleSelected}
             onToggle={toggle}
+            classeGrid={classeGrid}
           />
         )}
       </ViewTransition>

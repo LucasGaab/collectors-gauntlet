@@ -26,17 +26,20 @@ export function FigureGrid({
   optionColors,
   selected,
   onToggle,
+  classeGrid,
 }: {
   figures: FigureCard[];
   optionColors: OptionColorMap;
   selected: string[];
   onToggle: (id: string) => void;
+  /** Colunas vindas da preferência de densidade. */
+  classeGrid?: string;
 }) {
   const colorFor = (categoria: string, valor: string) =>
     optionColors[categoria]?.[valor] ?? FALLBACK_COLOR;
 
   return (
-    <Stagger className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
+    <Stagger className={`grid gap-4 ${classeGrid ?? "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5"}`}>
       {figures.map((f) => {
         const isSelected = selected.includes(f.id);
         return (

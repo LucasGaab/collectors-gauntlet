@@ -14,6 +14,7 @@ import { CollectionBody } from "@/components/CollectionBody";
 import { ToastFromQuery } from "@/components/ToastFromQuery";
 import { EmptyState } from "@/components/EmptyState";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
+import { getPreferencias, classeDensidade } from "@/lib/preferencias";
 
 export function normalizeSearchParams(sp: {
   [key: string]: string | string[] | undefined;
@@ -42,13 +43,14 @@ export async function CollectionView({
   showConjuntoFilter: boolean;
   params: FigureSearchParams;
 }) {
-  const [figures, filterOptions] = await Promise.all([
+  const [figures, filterOptions, prefs] = await Promise.all([
     prisma.figure.findMany({
       where: buildFigureWhere(params, scopeStatuses),
       orderBy: buildFigureOrderBy(params),
       include: { marca: true, grupo: true },
     }),
     getFilterOptions(),
+    getPreferencias(),
   ]);
 
   const optionColors = buildOptionColorMap(filterOptions.allOptions);
@@ -152,6 +154,7 @@ export async function CollectionView({
           // Todos os status (não só os do escopo atual): mover uma peça da
           // Coleção pra Wishlist — e vice-versa — é uma ação legítima em lote.
           statuses={filterOptions.statuses.map((s) => ({ id: s.id, valor: s.valor }))}
+          classeGrid={classeDensidade(prefs.densidade)}
         />
       )}
     </AppShell>

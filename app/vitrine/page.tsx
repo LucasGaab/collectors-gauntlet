@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { NOT_DELETED, getCollectionStatuses } from "@/lib/queries";
+import { getPreferencias } from "@/lib/preferencias";
 import { LogoHorizontal } from "@/components/LogoMark";
 import { Vitrine } from "@/components/Vitrine";
 import { EmptyState } from "@/components/EmptyState";
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
  * nenhum caminho de edição — sem AppShell, sem botões de editar/excluir.
  */
 export default async function VitrinePage() {
-  const statusesColecao = await getCollectionStatuses();
+  const [statusesColecao, prefs] = await Promise.all([getCollectionStatuses(), getPreferencias()]);
 
   const pecas = await prisma.figure.findMany({
     where: { ...NOT_DELETED, status: { in: statusesColecao } },
@@ -41,7 +42,14 @@ export default async function VitrinePage() {
     <div className="min-h-screen bg-background text-foreground">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-4 px-6 py-6">
-          <LogoHorizontal height={40} />
+          <div className="flex min-w-0 items-center gap-4">
+            <LogoHorizontal height={40} />
+            {prefs.nomeColecao && (
+              <span className="display-title truncate border-l border-border pl-4 text-xl text-gold">
+                {prefs.nomeColecao}
+              </span>
+            )}
+          </div>
           <Link
             href="/"
             className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-colors hover:text-primary"
