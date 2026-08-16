@@ -252,3 +252,137 @@ input[type="color"] {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-muted-foreground);
 }
+
+/*
+ * Temas de universo (ideia 39). Cada tema redefine só os tokens de cor sobre a
+ * base escura — nenhum componente conhece o tema, todos leem as variáveis.
+ * O atributo fica no <html>, escrito pelo servidor a partir de Preferencias.
+ */
+[data-tema="cosmico"] {
+  --background: oklch(0.15 0.03 300);
+  --surface: oklch(0.2 0.045 300);
+  --surface-high: oklch(0.25 0.055 300);
+  --card: oklch(0.2 0.045 300);
+  --popover: oklch(0.2 0.045 300);
+  --secondary: oklch(0.25 0.055 300);
+  --muted: oklch(0.25 0.055 300);
+  --accent: oklch(0.25 0.055 300);
+  --primary: oklch(0.62 0.22 305);
+  --primary-hover: oklch(0.68 0.2 305);
+  --gold: oklch(0.85 0.13 92);
+  --destructive: oklch(0.6 0.22 20);
+  --ring: oklch(0.62 0.22 305 / 60%);
+}
+
+[data-tema="simbionte"] {
+  --background: oklch(0.11 0 0);
+  --surface: oklch(0.16 0 0);
+  --surface-high: oklch(0.22 0 0);
+  --card: oklch(0.16 0 0);
+  --popover: oklch(0.16 0 0);
+  --secondary: oklch(0.22 0 0);
+  --muted: oklch(0.22 0 0);
+  --accent: oklch(0.22 0 0);
+  --muted-foreground: oklch(0.68 0 0);
+  --primary: oklch(0.97 0 0);
+  --primary-hover: oklch(0.88 0 0);
+  --primary-foreground: oklch(0.11 0 0);
+  --gold: oklch(0.75 0.02 0);
+  --destructive: oklch(0.58 0.23 27.5);
+  --ring: oklch(0.97 0 0 / 50%);
+}
+
+[data-tema="gama"] {
+  --background: oklch(0.15 0.02 150);
+  --surface: oklch(0.2 0.03 150);
+  --surface-high: oklch(0.25 0.04 150);
+  --card: oklch(0.2 0.03 150);
+  --popover: oklch(0.2 0.03 150);
+  --secondary: oklch(0.25 0.04 150);
+  --muted: oklch(0.25 0.04 150);
+  --accent: oklch(0.25 0.04 150);
+  --primary: oklch(0.75 0.24 142);
+  --primary-hover: oklch(0.8 0.22 142);
+  --primary-foreground: oklch(0.13 0.02 150);
+  --gold: oklch(0.68 0.2 305);
+  --destructive: oklch(0.62 0.22 25);
+  --ring: oklch(0.75 0.24 142 / 55%);
+}
+
+[data-tema="asgard"] {
+  --background: oklch(0.16 0.03 255);
+  --surface: oklch(0.21 0.04 255);
+  --surface-high: oklch(0.27 0.05 255);
+  --card: oklch(0.21 0.04 255);
+  --popover: oklch(0.21 0.04 255);
+  --secondary: oklch(0.27 0.05 255);
+  --muted: oklch(0.27 0.05 255);
+  --accent: oklch(0.27 0.05 255);
+  --primary: oklch(0.8 0.14 88);
+  --primary-hover: oklch(0.86 0.13 88);
+  --primary-foreground: oklch(0.18 0.03 255);
+  --gold: oklch(0.88 0.12 92);
+  --destructive: oklch(0.6 0.22 27);
+  --ring: oklch(0.8 0.14 88 / 55%);
+}
+
+[data-tema="noir"] {
+  --background: oklch(0.12 0.004 285);
+  --surface: oklch(0.17 0.004 285);
+  --surface-high: oklch(0.23 0.005 285);
+  --card: oklch(0.17 0.004 285);
+  --popover: oklch(0.17 0.004 285);
+  --secondary: oklch(0.23 0.005 285);
+  --muted: oklch(0.23 0.005 285);
+  --accent: oklch(0.23 0.005 285);
+  --muted-foreground: oklch(0.6 0.003 285);
+  --primary: oklch(0.55 0.24 27.5);
+  --primary-hover: oklch(0.62 0.22 27.5);
+  --gold: oklch(0.72 0.01 285);
+  --ring: oklch(0.55 0.24 27.5 / 55%);
+}
+
+/* Grão de papel de polpa (ideia 09), ligado nas Preferências. */
+[data-grao="1"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: radial-gradient(currentColor 0.5px, transparent 0.6px);
+  background-size: 3px 3px;
+}
+
+/* Caixa de narração de HQ (ideia 03) — substitui o .eyebrow onde há peso. */
+@utility caption-box {
+  display: inline-block;
+  background: var(--gold);
+  color: oklch(0.2 0.03 60);
+  border: 3px solid #000;
+  padding: 0.25rem 0.6rem;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+/* Balão de fala (ideia 05) para as observações da peça. */
+@utility balao-fala {
+  position: relative;
+  background: var(--surface-high);
+  border: 2px solid var(--border);
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  &::after {
+    content: "";
+    position: absolute;
+    left: 1.75rem;
+    bottom: -12px;
+    width: 0;
+    height: 0;
+    border-left: 10px solid transparent;
+    border-right: 14px solid transparent;
+    border-top: 12px solid var(--surface-high);
+  }
+}

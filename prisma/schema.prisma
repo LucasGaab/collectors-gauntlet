@@ -43,6 +43,33 @@ model Figure {
   // Soft delete: exclusão vai pra "lixeira" e pode ser desfeita. Toda leitura
   // filtra por `deletedAt: null` — ver notDeleted() em lib/queries.ts.
   deletedAt     DateTime?
+
+  // Ficha de Poder: notas de 1 a 7 dadas pelo usuário, no formato dos
+  // handbooks antigos. Nulo = ainda não avaliado.
+  articulacao   Int?
+  pintura       Int?
+  acessorios    Int?
+  semelhanca    Int?
+  raridade      Int?
+
+  // Momento em que a peça saiu da wishlist e entrou na coleção. Alimenta o
+  // "tempo de caçada" — quanto tempo você perseguiu a peça.
+  conquistadaEm DateTime?
+
+  // Cobiça na wishlist: "alta" | "media" | "baixa".
+  prioridade    String?
+
+  // Era da HQ do personagem (Ouro, Prata, Bronze, Moderna).
+  era           String?
+
+  // Cadastro relâmpago: entra só com nome e foto, completa depois.
+  rascunho      Boolean   @default(false)
+
+  // Cor dominante extraída da foto no upload (hex), para o filtro por paleta.
+  corDominante  String?
+
+  // Altura real em cm, para comparação de escala.
+  alturaCm      Float?
   marcaId       String
   marca         Marca      @relation(fields: [marcaId], references: [id])
   grupoId       String
@@ -70,6 +97,8 @@ model Grupo {
   /// Total alvo do grupo, quando você sabe o tamanho do set mesmo sem ter
   /// catalogado tudo. Vazio = o alvo é o total de peças já catalogadas.
   meta    Int?
+  /// Nome do ícone (lucide) exibido junto da badge do grupo.
+  icone   String?
   figures Figure[]
 }
 
@@ -97,4 +126,17 @@ model Option {
   ordem     Int    @default(0)
 
   @@unique([categoria, valor])
+}
+
+/// Preferências do app. Tabela de uma linha só (id fixo "singleton") — é um
+/// app single-user, então não há a quem associar a configuração.
+model Preferencias {
+  id              String   @id @default("singleton")
+  nomeColecao     String?
+  tema            String   @default("obsidian")
+  densidade       Int      @default(5)
+  orcamentoMensal Float?
+  graoPapel       Boolean  @default(false)
+  somAmbiente     Boolean  @default(false)
+  atualizadoEm    DateTime @updatedAt
 }

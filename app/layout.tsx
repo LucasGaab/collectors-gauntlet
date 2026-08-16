@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Anton, Inter } from "next/font/google";
 import { AnimatePresence } from "framer-motion";
 import { ToastProvider } from "@/components/Toast";
+import { getPreferencias } from "@/lib/preferencias";
 import "./globals.css";
 
 const anton = Anton({
@@ -35,10 +36,16 @@ type Props = {
   modal: React.ReactNode;
 };
 
-export default function RootLayout({ children, modal }: Props) {
+export default async function RootLayout({ children, modal }: Props) {
+  // Tema e grão vêm do servidor e já saem no HTML — sem piscar de tema errado
+  // na primeira pintura, que aconteceria se fossem aplicados no cliente.
+  const prefs = await getPreferencias();
+
   return (
     <html
       lang="pt-BR"
+      data-tema={prefs.tema}
+      data-grao={prefs.graoPapel ? "1" : "0"}
       className={`${anton.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-background text-foreground font-sans">

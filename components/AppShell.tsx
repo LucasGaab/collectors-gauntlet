@@ -9,6 +9,7 @@ import {
   Boxes,
   Heart,
   SlidersHorizontal,
+  Settings,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const NAV = [
   { to: "/wishlist", label: "Wishlist", icon: Heart },
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/listas", label: "Listas", icon: SlidersHorizontal },
+  { to: "/preferencias", label: "Ajustes", icon: Settings },
 ] as const;
 
 const STORAGE_KEY = "gauntlet-sidebar-collapsed";
