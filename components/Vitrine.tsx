@@ -112,7 +112,15 @@ export function Vitrine({ pecas }: { pecas: PecaVitrine[] }) {
               e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
             }}
           >
-            <div className="relative aspect-square w-full">
+            {/*
+              Morph de elemento compartilhado: a miniatura cresce e vira a foto
+              em tela cheia. O layoutId sai do card enquanto ele é o item aberto
+              — dois elementos com o mesmo id simultaneamente quebrariam o morph.
+            */}
+            <motion.div
+              layoutId={indice === i ? undefined : `foto-${p.id}`}
+              className="relative aspect-square w-full"
+            >
               {p.thumbUrl ?? p.imagemUrl ? (
                 <Image
                   src={(p.thumbUrl ?? p.imagemUrl)!}
@@ -125,7 +133,7 @@ export function Vitrine({ pecas }: { pecas: PecaVitrine[] }) {
               ) : (
                 <ImagePlaceholder />
               )}
-            </div>
+            </motion.div>
             <div className="p-3">
               <p className="truncate text-[9px] font-bold uppercase tracking-widest text-muted-foreground">
                 {p.marca.nome}
@@ -176,9 +184,7 @@ export function Vitrine({ pecas }: { pecas: PecaVitrine[] }) {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={atual.id}
-                  initial={{ opacity: 0, scale: 0.97 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.02 }}
+                  layoutId={`foto-${atual.id}`}
                   transition={{ duration: 0.35, ease: "easeOut" }}
                   className="relative h-full w-full max-w-3xl"
                 >

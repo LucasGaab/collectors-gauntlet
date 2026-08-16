@@ -6,6 +6,7 @@ import { FigureTable, type FigureRow, type OptionColorMap } from "@/components/F
 import { FigureGrid } from "@/components/FigureGrid";
 import { ViewTransition } from "@/components/ViewTransition";
 import { BulkActionBar } from "@/components/BulkActionBar";
+import { CompararModal } from "@/components/CompararModal";
 import { NAV_IDS_STORAGE_KEY } from "@/lib/navIds";
 
 /**
@@ -27,6 +28,7 @@ export function CollectionBody({
   statuses: { id: string; valor: string }[];
 }) {
   const [selected, setSelected] = useState<string[]>([]);
+  const [comparando, setComparando] = useState(false);
 
   const ids = useMemo(() => figures.map((f) => f.id), [figures]);
 
@@ -79,7 +81,22 @@ export function CollectionBody({
 
       <AnimatePresence>
         {visibleSelected.length > 0 && (
-          <BulkActionBar selectedIds={visibleSelected} statuses={statuses} onClear={clear} />
+          <BulkActionBar
+            selectedIds={visibleSelected}
+            statuses={statuses}
+            onClear={clear}
+            onComparar={visibleSelected.length >= 2 ? () => setComparando(true) : undefined}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {comparando && (
+          <CompararModal
+            pecas={figures.filter((f) => visibleSelected.includes(f.id)).slice(0, 3)}
+            optionColors={optionColors}
+            aoFechar={() => setComparando(false)}
+          />
         )}
       </AnimatePresence>
     </>

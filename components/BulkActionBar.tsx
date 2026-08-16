@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Trash2, X } from "lucide-react";
+import { Columns3, Trash2, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { bulkUpdateStatus, bulkDeleteFigures, bulkRestoreFigures } from "@/lib/actions/figures";
 import { useToast } from "@/components/Toast";
@@ -10,10 +10,13 @@ export function BulkActionBar({
   selectedIds,
   statuses,
   onClear,
+  onComparar,
 }: {
   selectedIds: string[];
   statuses: { id: string; valor: string }[];
   onClear: () => void;
+  /** Só chega definido com 2+ peças selecionadas. */
+  onComparar?: () => void;
 }) {
   const [status, setStatus] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -74,6 +77,16 @@ export function BulkActionBar({
           </option>
         ))}
       </select>
+
+      {onComparar && (
+        <button
+          type="button"
+          onClick={onComparar}
+          className="flex items-center gap-2 rounded-full border border-border px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-colors hover:border-primary/60 hover:text-primary"
+        >
+          <Columns3 className="size-3.5" /> Comparar
+        </button>
+      )}
 
       <button
         type="button"

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Copy, Pencil, Trash2, X } from "lucide-react";
 import type { Figure, Marca, Grupo, Conjunto } from "@prisma/client";
@@ -42,6 +43,9 @@ export function FigureDetail({
   isModal?: boolean;
 }) {
   const [mode, setMode] = useState<"view" | "edit">(initialMode);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ container: scrollRef });
+  const parallaxY = useTransform(scrollYProgress, [0, 1], [-18, 18]);
   const router = useRouter();
   const { showToast } = useToast();
   const [isPending, startTransition] = useTransition();
@@ -140,7 +144,7 @@ export function FigureDetail({
         </div>
       </div>
 
-      <div className="overflow-y-auto p-6">
+      <div ref={scrollRef} className="overflow-y-auto p-6">
         {mode === "edit" ? (
           <FigureForm
             action={updateAction}
@@ -154,14 +158,18 @@ export function FigureDetail({
               <div className="relative aspect-[4/5] overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-vitrine)]">
                 {figure.imagemUrl ? (
                   <>
-                    <Image
-                      src={figure.imagemUrl}
-                      alt={figure.nome}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 300px"
-                      unoptimized
-                      className="object-cover"
-                    />
+                    {/* Parallax sutil: a foto se move um pouco mais devagar que o
+                        scroll do container, dando profundidade de vitrine. */}
+                    <motion.div style={{ y: parallaxY }} className="absolute -inset-y-6 inset-x-0">
+                      <Image
+                        src={figure.imagemUrl}
+                        alt={figure.nome}
+                        fill
+                        sizes="(max-width: 1024px) 100vw, 300px"
+                        unoptimized
+                        className="object-cover"
+                      />
+                    </motion.div>
                     <Lightbox src={figure.imagemUrl} alt={figure.nome} />
                   </>
                 ) : (

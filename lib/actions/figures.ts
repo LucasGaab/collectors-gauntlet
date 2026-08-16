@@ -111,7 +111,13 @@ export async function updateFigure(id: string, formData: FormData) {
   });
 
   revalidateFigures();
-  redirect(`${destinationFor(data.status)}?toast=atualizada`);
+
+  // Saiu da wishlist e entrou na coleção: isso é uma conquista, e a UI comemora.
+  // A regra é dinâmica (wishlist vs não-wishlist), não uma lista fixa de status.
+  const conquistou =
+    WISHLIST_STATUSES.includes(existing.status) && !WISHLIST_STATUSES.includes(data.status);
+
+  redirect(`${destinationFor(data.status)}?toast=${conquistou ? "conquistada" : "atualizada"}`);
 }
 
 /**

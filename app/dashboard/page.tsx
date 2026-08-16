@@ -3,7 +3,14 @@ import { NOT_DELETED, WISHLIST_STATUSES, getMetas } from "@/lib/queries";
 import { MetasPainel } from "@/components/MetasPainel";
 import { AppShell } from "@/components/AppShell";
 import { KpiCard } from "@/components/KpiCard";
-import { GrupoPieChart, MarcaBarChart, EscalaBarChart, type ChartDatum } from "@/components/DashboardCharts";
+import {
+  GrupoPieChart,
+  MarcaBarChart,
+  EscalaBarChart,
+  TimelineChart,
+  type ChartDatum,
+  type TimelineDatum,
+} from "@/components/DashboardCharts";
 import { Stagger, StaggerItem } from "@/components/motion";
 
 export const dynamic = "force-dynamic";
@@ -50,6 +57,21 @@ export default async function DashboardPage() {
     return [...map.entries()].map(([name, v]) => ({ name, value: v.count, corBg: v.corBg }));
   }
 
+  // Linha do tempo: quantas peças entraram por mês e o acumulado até ali.
+  const porMes = new Map<string, number>();
+  for (const f of figures) {
+    const chave = f.createdAt.toISOString().slice(0, 7); // AAAA-MM
+    porMes.set(chave, (porMes.get(chave) ?? 0) + 1);
+  }
+  const timelineData: TimelineDatum[] = [...porMes.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .reduce<TimelineDatum[]>((acc, [chave, novas]) => {
+      const [ano, mes] = chave.split("-");
+      const acumulado = (acc.at(-1)?.acumulado ?? 0) + novas;
+      acc.push({ mes: `${mes}/${ano.slice(2)}`, novas, acumulado });
+      return acc;
+    }, []);
+
   const grupoData = groupBy(figures, (f) => f.grupo.nome, (f) => f.grupo);
   const marcaData = groupBy(figures, (f) => f.marca.nome, (f) => f.marca);
 
@@ -82,6 +104,8 @@ export default async function DashboardPage() {
           </StaggerItem>
         ))}
       </Stagger>
+
+      <TimelineChart data={timelineData} />
 
       <MetasPainel grupos={metas.grupos} conjuntos={metas.conjuntos} />
 

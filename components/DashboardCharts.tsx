@@ -4,6 +4,8 @@ import {
   Bar,
   BarChart,
   Cell,
+  ComposedChart,
+  Line,
   Pie,
   PieChart,
   ResponsiveContainer,
@@ -112,6 +114,43 @@ export function EscalaBarChart({ data }: { data: ChartDatum[] }) {
             <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(255,255,255,0.04)" }} />
             <Bar dataKey="value" fill="#E8C468" radius={[0, 6, 6, 0]} animationDuration={280} />
           </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </ChartCard>
+  );
+}
+
+export type TimelineDatum = { mes: string; acumulado: number; novas: number };
+
+/**
+ * Linha do tempo de aquisição: barras = peças que entraram no mês, linha =
+ * total acumulado da coleção. Mostra o ritmo de crescimento, não só o estado.
+ */
+export function TimelineChart({ data }: { data: TimelineDatum[] }) {
+  if (data.length === 0) return null;
+
+  return (
+    <ChartCard title="Crescimento da coleção">
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <ComposedChart data={data} margin={{ top: 4, right: 8, bottom: 0, left: -18 }}>
+            <XAxis dataKey="mes" tick={axisTick} tickLine={false} axisLine={false} />
+            <YAxis tick={axisTick} tickLine={false} axisLine={false} allowDecimals={false} />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              cursor={{ fill: "rgba(255,255,255,0.04)" }}
+              formatter={(valor, nome) => [valor as number, nome === "novas" ? "No mês" : "Acumulado"]}
+            />
+            <Bar dataKey="novas" fill="#8E2226" radius={[4, 4, 0, 0]} maxBarSize={28} />
+            <Line
+              type="monotone"
+              dataKey="acumulado"
+              stroke="#E8C468"
+              strokeWidth={2}
+              dot={{ r: 3, fill: "#E8C468" }}
+              activeDot={{ r: 5 }}
+            />
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </ChartCard>

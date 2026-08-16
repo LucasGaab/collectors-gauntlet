@@ -160,6 +160,37 @@
   }
 }
 
+/* Skeleton com brilho passando, em vez de só piscar opacidade. */
+@utility shimmer {
+  position: relative;
+  overflow: hidden;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--foreground) 8%, transparent),
+      transparent
+    );
+    animation: shimmer-pass 1.4s infinite;
+  }
+}
+
+@keyframes shimmer-pass {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shimmer::after {
+    animation: none;
+  }
+}
+
 /* Faixa rolável sem barra visível (linha de filtros no mobile). */
 @utility no-scrollbar {
   scrollbar-width: none;
