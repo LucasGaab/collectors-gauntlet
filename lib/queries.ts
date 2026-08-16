@@ -116,6 +116,64 @@ export async function getFilterOptions() {
   };
 }
 
+export type MetaProgresso = {
+  id: string;
+  nome: string;
+  corBg: string;
+  corFg: string;
+  /** Peças que você já tem (qualquer status que não seja wishlist). */
+  tenho: number;
+  /** Ainda na wishlist dentro deste grupo/conjunto. */
+  faltamCatalogadas: number;
+  /** Alvo: a meta manual, ou o total já catalogado quando não há meta. */
+  alvo: number;
+  /** Se veio de meta manual (aí o alvo pode ser maior que o catalogado). */
+  metaManual: boolean;
+};
+
+function montarProgresso(
+  base: { id: string; nome: string; corBg: string; corFg: string; meta: number | null },
+  statuses: string[],
+): MetaProgresso {
+  const total = statuses.length;
+  const tenho = statuses.filter((s) => !WISHLIST_STATUSES.includes(s)).length;
+  const alvo = base.meta && base.meta > 0 ? base.meta : total;
+  return {
+    id: base.id,
+    nome: base.nome,
+    corBg: base.corBg,
+    corFg: base.corFg,
+    tenho,
+    faltamCatalogadas: total - tenho,
+    alvo: Math.max(alvo, tenho),
+    metaManual: Boolean(base.meta && base.meta > 0),
+  };
+}
+
+/**
+ * Progresso de coleção por Grupo e por Conjunto: quantas peças você já tem
+ * contra o alvo. Itens na lixeira ficam de fora.
+ */
+export async function getMetas(): Promise<{ grupos: MetaProgresso[]; conjuntos: MetaProgresso[] }> {
+  const [grupos, conjuntos] = await Promise.all([
+    prisma.grupo.findMany({
+      orderBy: { ordem: "asc" },
+      include: { figures: { where: NOT_DELETED, select: { status: true } } },
+    }),
+    prisma.conjunto.findMany({
+      orderBy: { ordem: "asc" },
+      include: { figures: { where: NOT_DELETED, select: { status: true } } },
+    }),
+  ]);
+
+  const mapear = (lista: typeof grupos | typeof conjuntos) =>
+    lista
+      .map((item) => montarProgresso(item, item.figures.map((f) => f.status)))
+      .filter((p) => p.alvo > 0);
+
+  return { grupos: mapear(grupos), conjuntos: mapear(conjuntos) };
+}
+
 export function buildOptionColorMap(options: { categoria: string; valor: string; corBg: string; corFg: string }[]) {
   const map: Record<string, Record<string, { corBg: string; corFg: string }>> = {};
   for (const o of options) {

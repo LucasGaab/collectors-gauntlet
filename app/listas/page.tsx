@@ -18,12 +18,16 @@ export default async function ListasPage() {
     prisma.option.findMany({ orderBy: { ordem: "asc" } }),
   ]);
 
-  const toItems = (arr: { id: string; corBg: string; corFg: string }[], labelKey: "nome" | "valor") =>
+  const toItems = (
+    arr: { id: string; corBg: string; corFg: string; meta?: number | null }[],
+    labelKey: "nome" | "valor",
+  ) =>
     arr.map((a) => ({
       id: a.id,
       label: (a as unknown as Record<string, string>)[labelKey],
       corBg: a.corBg,
       corFg: a.corFg,
+      meta: a.meta ?? null,
     })) as EditableItem[];
 
   const byCategoria = (categoria: string) => options.filter((o) => o.categoria === categoria);
@@ -56,8 +60,10 @@ export default async function ListasPage() {
         <StaggerItem>
           <EditableList
             title="Grupo"
+            description="A meta define o total alvo do progresso no Dashboard. Vazia = usa o total já catalogado."
             labelField="nome"
             labelPlaceholder="Novo grupo"
+            withMeta
             items={toItems(grupos, "nome")}
             onCreate={createGrupo}
             onUpdate={updateGrupo}
@@ -70,6 +76,7 @@ export default async function ListasPage() {
             description="Agrupamentos pessoais dentro da Coleção — uma figura pode estar em vários."
             labelField="nome"
             labelPlaceholder="Novo conjunto"
+            withMeta
             items={toItems(conjuntos, "nome")}
             onCreate={createConjunto}
             onUpdate={updateConjunto}

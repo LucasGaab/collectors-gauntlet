@@ -16,6 +16,11 @@ const FALLBACK_COLOR = { corBg: "#EFEFEF", corFg: "#3D3D3D" };
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+/** Peça cadastrada nos últimos 7 dias ganha selo de novidade. */
+const DIAS_NOVIDADE = 7;
+const ehNova = (criadaEm: Date) =>
+  Date.now() - new Date(criadaEm).getTime() < DIAS_NOVIDADE * 24 * 60 * 60 * 1000;
+
 export function FigureGrid({
   figures,
   optionColors,
@@ -65,6 +70,11 @@ export function FigureGrid({
               </Link>
               <div className="pointer-events-none absolute left-2 bottom-2 z-10 flex flex-wrap gap-1">
                 <Badge label={f.status} {...colorFor("status", f.status)} />
+                {ehNova(f.createdAt) && (
+                  <span className="inline-flex animate-pulse items-center rounded bg-gold px-2 py-1 text-[9px] font-bold uppercase tracking-wider text-background">
+                    Novo
+                  </span>
+                )}
               </div>
               <label
                 className={`absolute left-2 top-2 z-20 grid size-7 cursor-pointer place-items-center rounded-full bg-background/80 backdrop-blur transition-opacity duration-150 ${

@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
-import { NOT_DELETED, WISHLIST_STATUSES } from "@/lib/queries";
+import { NOT_DELETED, WISHLIST_STATUSES, getMetas } from "@/lib/queries";
+import { MetasPainel } from "@/components/MetasPainel";
 import { AppShell } from "@/components/AppShell";
 import { KpiCard } from "@/components/KpiCard";
 import { GrupoPieChart, MarcaBarChart, EscalaBarChart, type ChartDatum } from "@/components/DashboardCharts";
@@ -10,7 +11,8 @@ export const dynamic = "force-dynamic";
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
 export default async function DashboardPage() {
-  const [figures, escalaOptions, statusOptions] = await Promise.all([
+  const [metas, figures, escalaOptions, statusOptions] = await Promise.all([
+    getMetas(),
     prisma.figure.findMany({ where: NOT_DELETED, include: { marca: true, grupo: true } }),
     prisma.option.findMany({ where: { categoria: "escala" } }),
     prisma.option.findMany({ where: { categoria: "status" }, orderBy: { ordem: "asc" } }),
@@ -80,6 +82,8 @@ export default async function DashboardPage() {
           </StaggerItem>
         ))}
       </Stagger>
+
+      <MetasPainel grupos={metas.grupos} conjuntos={metas.conjuntos} />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <GrupoPieChart data={grupoData} />

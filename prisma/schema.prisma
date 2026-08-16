@@ -67,6 +67,9 @@ model Grupo {
   corBg   String
   corFg   String
   ordem   Int      @default(0)
+  /// Total alvo do grupo, quando você sabe o tamanho do set mesmo sem ter
+  /// catalogado tudo. Vazio = o alvo é o total de peças já catalogadas.
+  meta    Int?
   figures Figure[]
 }
 
@@ -79,6 +82,8 @@ model Conjunto {
   corBg   String
   corFg   String
   ordem   Int      @default(0)
+  /// Total alvo do conjunto (ver Grupo.meta).
+  meta    Int?
   figures Figure[]
 }
 

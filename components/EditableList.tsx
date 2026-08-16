@@ -10,6 +10,8 @@ export type EditableItem = {
   label: string;
   corBg: string;
   corFg: string;
+  /** Alvo de peças (só Grupo e Conjunto usam). */
+  meta?: number | null;
 };
 
 type Props = {
@@ -19,6 +21,8 @@ type Props = {
   labelField: string;
   labelPlaceholder?: string;
   hiddenFields?: Record<string, string>;
+  /** Habilita a coluna de meta (total alvo) usada no progresso do dashboard. */
+  withMeta?: boolean;
   onCreate: (formData: FormData) => Promise<void>;
   onUpdate: (id: string, formData: FormData) => Promise<void>;
   onDelete: (id: string) => Promise<{ error?: string }>;
@@ -34,6 +38,7 @@ export function EditableList({
   labelField,
   labelPlaceholder,
   hiddenFields,
+  withMeta,
   onCreate,
   onUpdate,
   onDelete,
@@ -49,11 +54,12 @@ export function EditableList({
     return { ...item, ...overrides[item.id] };
   }
 
-  function buildFormData(label: string, corBg: string, corFg: string) {
+  function buildFormData(label: string, corBg: string, corFg: string, meta?: number | null) {
     const fd = new FormData();
     fd.set(labelField, label);
     fd.set("corBg", corBg);
     fd.set("corFg", corFg);
+    if (withMeta) fd.set("meta", meta == null ? "" : String(meta));
     if (hiddenFields) {
       for (const [k, v] of Object.entries(hiddenFields)) fd.set(k, v);
     }
@@ -67,7 +73,10 @@ export function EditableList({
   function commit(item: EditableItem) {
     const merged = displayItem(item);
     startTransition(async () => {
-      await onUpdate(item.id, buildFormData(merged.label.trim(), merged.corBg, merged.corFg));
+      await onUpdate(
+        item.id,
+        buildFormData(merged.label.trim(), merged.corBg, merged.corFg, merged.meta),
+      );
       setOverrides((prev) => {
         const next = { ...prev };
         delete next[item.id];
@@ -117,6 +126,22 @@ export function EditableList({
                 className="min-w-0 flex-1 bg-transparent text-sm outline-none"
               />
               <Badge label={item.label} corBg={item.corBg} corFg={item.corFg} />
+              {withMeta && (
+                <input
+                  type="number"
+                  min={0}
+                  value={item.meta ?? ""}
+                  placeholder="meta"
+                  title="Total alvo de peças (vazio = usa o total já catalogado)"
+                  onChange={(e) =>
+                    patchRow(item.id, {
+                      meta: e.target.value === "" ? null : Number(e.target.value),
+                    })
+                  }
+                  onBlur={() => commit(item)}
+                  className="w-14 shrink-0 rounded border border-border bg-background px-2 py-1 text-xs outline-none focus:border-primary/60"
+                />
+              )}
               <input
                 type="color"
                 value={item.corBg}
