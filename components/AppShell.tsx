@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -12,7 +13,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 import type { ReactNode } from "react";
-import { LogoMark } from "@/components/LogoMark";
+import { LogoMark, LogoHorizontal } from "@/components/LogoMark";
+import { MobileBrandBar } from "@/components/MobileBrandBar";
+import { CommandPalette } from "@/components/CommandPalette";
 
 const NAV = [
   { to: "/", label: "Coleção", icon: Boxes },
@@ -22,6 +25,21 @@ const NAV = [
 ] as const;
 
 const STORAGE_KEY = "gauntlet-sidebar-collapsed";
+
+/**
+ * Feedback de navegação pendente. Precisa viver DENTRO do <Link> — é assim que
+ * o useLinkStatus sabe a qual link se refere.
+ */
+function NavPending() {
+  const { pending } = useLinkStatus();
+  if (!pending) return null;
+  return (
+    <span
+      aria-hidden
+      className="absolute inset-x-0 bottom-0 h-0.5 origin-left animate-pulse rounded-full bg-primary"
+    />
+  );
+}
 
 export function AppShell({
   title,
@@ -62,13 +80,15 @@ export function AppShell({
       <aside
         className={`fixed left-0 top-0 z-40 hidden h-full md:flex ${sidebarWidth} flex-col border-r border-border bg-surface transition-[width] duration-200`}
       >
-        <div className="flex items-center justify-between gap-2 p-6">
-          <Link href="/" className="flex min-w-0 items-center gap-3">
-            <LogoMark size={40} className="shrink-0" />
+        <div className="flex items-center justify-center p-5">
+          {/* Sidebar expandida mostra o logo horizontal ocupando a largura útil;
+              recolhida (ou em telas médias), só a marca. */}
+          <Link href="/" className="flex w-full min-w-0 items-center justify-center">
+            <LogoMark size={44} className={showLabels ? "shrink-0 lg:hidden" : "shrink-0"} />
+            {/* max-w segura a altura: com w-full puro (216px úteis) o logo passaria
+                de 120px de altura e dominaria a sidebar. */}
             {showLabels && (
-              <span className="display-title hidden truncate text-xl leading-5 lg:block">
-                Collector&apos;s Gauntlet
-              </span>
+              <LogoHorizontal className="hidden h-auto w-full max-w-[180px] lg:block" />
             )}
           </Link>
         </div>
@@ -82,7 +102,7 @@ export function AppShell({
                 href={to}
                 title={label}
                 className={
-                  "flex items-center gap-4 rounded-lg px-4 py-3 transition-colors duration-200 " +
+                  "relative flex items-center gap-4 rounded-lg px-4 py-3 transition-colors duration-200 " +
                   (active
                     ? "border-l-2 border-primary bg-surface-high text-primary"
                     : "text-muted-foreground hover:bg-foreground/5 hover:text-foreground")
@@ -94,6 +114,7 @@ export function AppShell({
                     {label}
                   </span>
                 )}
+                <NavPending />
               </Link>
             );
           })}
@@ -123,6 +144,9 @@ export function AppShell({
         )}
       </aside>
 
+      <MobileBrandBar />
+      <CommandPalette />
+
       {/* Navbar inferior — só no mobile. pb com safe-area pro indicador do iPhone. */}
       <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">
         {NAV.map(({ to, label, icon: Icon }) => {
@@ -132,20 +156,29 @@ export function AppShell({
               key={to}
               href={to}
               className={
-                "flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors " +
+                "relative flex flex-1 flex-col items-center gap-1 py-2.5 transition-colors " +
                 (active ? "text-primary" : "text-muted-foreground")
               }
             >
               <Icon className="size-5" strokeWidth={2} />
               <span className="text-[9px] font-bold uppercase tracking-wider">{label}</span>
+              {active && (
+                <span
+                  aria-hidden
+                  className="absolute inset-x-4 top-0 h-0.5 rounded-full bg-primary"
+                />
+              )}
+              <NavPending />
             </Link>
           );
         })}
       </nav>
 
-      {/* pb-20 reserva espaço pra navbar; no desktop ela não existe. */}
-      <main className={`${mainPadding} pb-20 transition-[padding] duration-200 md:pb-0`}>
-        <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-background/70 px-4 backdrop-blur-md md:h-20 md:gap-6 md:px-8">
+      {/* pb-20 reserva espaço pra navbar inferior; pt-13 pra faixa de marca do topo. */}
+      <main
+        className={`${mainPadding} pb-20 pt-[64px] transition-[padding] duration-200 md:pb-0 md:pt-0`}
+      >
+        <header className="sticky top-[var(--brand-offset,64px)] z-30 flex h-16 items-center justify-between gap-3 border-b border-border bg-background/70 px-4 backdrop-blur-md transition-[top] duration-200 md:top-0 md:h-20 md:gap-6 md:px-8">
           <div className="min-w-0">
             <h1 className="display-title truncate text-lg md:text-2xl">{title}</h1>
             {subtitle ? (

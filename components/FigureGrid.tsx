@@ -37,9 +37,17 @@ export function FigureGrid({
         return (
         <StaggerItem key={f.id} className="group relative">
           <div className="absolute -inset-0.5 rounded-xl bg-gradient-to-b from-primary/25 to-transparent opacity-0 blur transition-opacity duration-300 group-hover:opacity-100" />
-          <div className={`relative overflow-hidden rounded-xl border bg-surface transition-transform duration-300 group-hover:-translate-y-1 ${
-            isSelected ? "border-primary" : "border-border"
-          }`}>
+          <div
+            onMouseMove={(e) => {
+              // Posição do cursor vira CSS var, consumida pelo brilho da vitrine.
+              const r = e.currentTarget.getBoundingClientRect();
+              e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
+              e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
+            }}
+            className={`vitrine-spot relative overflow-hidden rounded-xl border bg-surface transition-transform duration-300 group-hover:-translate-y-1 ${
+              isSelected ? "border-primary" : "border-border"
+            }`}
+          >
             <div className="relative aspect-square w-full">
               <Link href={`/figuras/${f.id}`} aria-label={`Ver ${f.nome}`} className="absolute inset-0 z-0">
                 {f.thumbUrl ?? f.imagemUrl ? (

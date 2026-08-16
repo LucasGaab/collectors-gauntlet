@@ -52,7 +52,9 @@ export async function CollectionView({
   ]);
 
   const optionColors = buildOptionColorMap(filterOptions.allOptions);
-  const view = params.view === "grid" ? "grid" : "table";
+  // Catálogo é o padrão: a vitrine com foto é a leitura natural da coleção.
+  // A tabela continua a um clique, e o ?view=table na URL manda.
+  const view = params.view === "table" ? "table" : "grid";
 
   const searchParamsString = new URLSearchParams(
     Object.entries(params).filter(([, v]) => v !== undefined) as [string, string][],

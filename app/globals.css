@@ -127,6 +127,39 @@
   }
 }
 
+/*
+  Vitrine: um brilho suave que segue o cursor sobre o card, como a luz de uma
+  estante de acrílico. As coordenadas vêm das CSS vars --mx/--my, escritas pelo
+  onMouseMove do card (FigureGrid). Sem cursor por perto, fica invisível.
+*/
+@utility vitrine-spot {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 300ms ease;
+    pointer-events: none;
+    background: radial-gradient(
+      220px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, var(--gold) 22%, transparent),
+      transparent 65%
+    );
+  }
+  &:hover::after {
+    opacity: 1;
+  }
+}
+
+/* Respeita quem pediu menos movimento no sistema. */
+@media (prefers-reduced-motion: reduce) {
+  .vitrine-spot::after {
+    display: none;
+  }
+}
+
 /* Faixa rolável sem barra visível (linha de filtros no mobile). */
 @utility no-scrollbar {
   scrollbar-width: none;

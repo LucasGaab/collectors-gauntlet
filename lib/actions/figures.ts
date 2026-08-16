@@ -218,6 +218,22 @@ export async function bulkRestoreFigures(ids: string[]) {
   revalidateFigures();
 }
 
+/** Busca enxuta para a paleta de comandos (⌘K). Só os campos que ela exibe. */
+export async function searchFiguresQuick(termo: string) {
+  const q = termo.trim();
+  if (q.length < 2) return [];
+
+  return prisma.figure.findMany({
+    where: {
+      ...NOT_DELETED,
+      OR: [{ nome: { contains: q } }, { personagem: { contains: q } }, { linha: { contains: q } }],
+    },
+    select: { id: true, nome: true, personagem: true, status: true, thumbUrl: true },
+    orderBy: { nome: "asc" },
+    take: 8,
+  });
+}
+
 /**
  * Detecção de duplicata no cadastro: procura peças com nome ou personagem
  * parecido pra avisar antes de salvar. Comparação simples por substring — o
