@@ -96,6 +96,19 @@ async function main() {
     }
   }
 
+  // As listas auxiliares acima são upsert (seguras de repetir). As figuras não:
+  // recriá-las apagaria a coleção real. Por isso o seed de figuras só roda com o
+  // banco vazio — ou explicitamente com SEED_RESET=1.
+  const jaExistem = await prisma.figure.count();
+  if (jaExistem > 0 && process.env.SEED_RESET !== "1") {
+    console.log(
+      `Já existem ${jaExistem} figuras — seed de figuras PULADO (listas auxiliares foram atualizadas).\n` +
+        `Para recriar mesmo assim, apagando tudo: SEED_RESET=1 npx prisma db seed`,
+    );
+    console.log("Seed concluido.");
+    return;
+  }
+
   console.log("Seeding figuras...");
   await prisma.figure.deleteMany({});
   for (const f of figures) {
