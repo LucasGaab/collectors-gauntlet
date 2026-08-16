@@ -21,6 +21,14 @@ function numOrNull(v: FormDataEntryValue | null): number | null {
   return Number.isNaN(n) ? null : n;
 }
 
+/** Nota da Ficha de Poder: inteiro de 1 a 7, ou null quando não avaliado. */
+function notaOrNull(v: FormDataEntryValue | null): number | null {
+  const s = (v ?? "").toString().trim();
+  if (s === "") return null;
+  const n = Math.round(Number(s));
+  return Number.isFinite(n) && n >= 1 && n <= 7 ? n : null;
+}
+
 function dateOrNull(v: FormDataEntryValue | null): Date | null {
   const s = (v ?? "").toString().trim();
   if (s === "") return null;
@@ -43,6 +51,14 @@ function figureDataFromForm(formData: FormData) {
     link: strOrNull(formData.get("link")),
     observacoes: strOrNull(formData.get("observacoes")),
     precoConferidoEm: dateOrNull(formData.get("precoConferidoEm")),
+    articulacao: notaOrNull(formData.get("articulacao")),
+    pintura: notaOrNull(formData.get("pintura")),
+    acessorios: notaOrNull(formData.get("acessorios")),
+    semelhanca: notaOrNull(formData.get("semelhanca")),
+    raridade: notaOrNull(formData.get("raridade")),
+    prioridade: strOrNull(formData.get("prioridade")),
+    era: strOrNull(formData.get("era")),
+    alturaCm: numOrNull(formData.get("alturaCm")),
     marcaId: formData.get("marcaId") as string,
     grupoId: formData.get("grupoId") as string,
   };
@@ -100,24 +116,27 @@ export async function updateFigure(id: string, formData: FormData) {
     thumbUrl = null;
   }
 
+  // Momento da conquista: gravado uma única vez, quando a peça deixa a wishlist.
+  const conquistandoAgora =
+    WISHLIST_STATUSES.includes(existing.status) && !WISHLIST_STATUSES.includes(data.status);
+
   await prisma.figure.update({
     where: { id },
     data: {
       ...data,
       imagemUrl,
       thumbUrl,
+      ...(conquistandoAgora && !existing.conquistadaEm ? { conquistadaEm: new Date() } : {}),
       conjuntos: { set: conjuntoIds.map((cid) => ({ id: cid })) },
     },
   });
 
   revalidateFigures();
 
-  // Saiu da wishlist e entrou na coleção: isso é uma conquista, e a UI comemora.
-  // A regra é dinâmica (wishlist vs não-wishlist), não uma lista fixa de status.
-  const conquistou =
-    WISHLIST_STATUSES.includes(existing.status) && !WISHLIST_STATUSES.includes(data.status);
-
-  redirect(`${destinationFor(data.status)}?toast=${conquistou ? "conquistada" : "atualizada"}`);
+  // A UI comemora a conquista; regra dinâmica (wishlist vs não-wishlist).
+  redirect(
+    `${destinationFor(data.status)}?toast=${conquistandoAgora ? "conquistada" : "atualizada"}`,
+  );
 }
 
 /**

@@ -9,6 +9,7 @@ import type { Figure, Marca, Grupo, Conjunto } from "@prisma/client";
 import { Badge } from "@/components/Badge";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { Lightbox } from "@/components/Lightbox";
+import { FichaPoder } from "@/components/FichaPoder";
 import { FigureForm, type FigureFormLists } from "@/components/FigureForm";
 import { updateFigure, deleteFigure, restoreFigure, duplicateFigure } from "@/lib/actions/figures";
 import { useToast } from "@/components/Toast";
@@ -83,6 +84,18 @@ export function FigureDetail({
   }
 
   const updateAction = updateFigure.bind(null, figure.id);
+
+  // Tempo entre o cadastro (quando entrou na wishlist) e a conquista.
+  const tempoDeCacada = (() => {
+    if (!figure.conquistadaEm) return null;
+    const dias = Math.round(
+      (figure.conquistadaEm.getTime() - figure.createdAt.getTime()) / 86_400_000,
+    );
+    if (dias < 1) return "menos de um dia";
+    if (dias < 30) return `${dias} dia${dias === 1 ? "" : "s"}`;
+    const meses = Math.round(dias / 30);
+    return `${meses} ${meses === 1 ? "mês" : "meses"}`;
+  })();
   const attrValue = (key: string): string =>
     (figure as unknown as Record<string, string>)[key];
 
@@ -238,10 +251,31 @@ export function FigureDetail({
               </div>
 
               <div className="glass-card rounded-2xl border border-border p-6">
-                <p className="eyebrow mb-4">Observações</p>
-                <p className="text-sm leading-relaxed text-muted-foreground">
-                  {figure.observacoes || "Sem observações."}
-                </p>
+                <FichaPoder
+                  notas={{
+                    articulacao: figure.articulacao,
+                    pintura: figure.pintura,
+                    acessorios: figure.acessorios,
+                    semelhanca: figure.semelhanca,
+                    raridade: figure.raridade,
+                  }}
+                />
+                {figure.conquistadaEm && (
+                  <p className="mt-4 border-t border-border pt-4 text-[10px] uppercase tracking-widest text-muted-foreground">
+                    Conquistada em {figure.conquistadaEm.toLocaleDateString("pt-BR")}
+                    {tempoDeCacada && ` · caçada por ${tempoDeCacada}`}
+                  </p>
+                )}
+              </div>
+
+              <div className="glass-card rounded-2xl border border-border p-6">
+                <p className="caption-box mb-4">Observações</p>
+                {/* Balão de fala: a observação é a "voz" da peça na ficha. */}
+                <div className="balao-fala">
+                  <p className="text-sm leading-relaxed text-foreground/85">
+                    {figure.observacoes || "Sem observações."}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

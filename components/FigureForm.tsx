@@ -6,6 +6,7 @@ import type { Figure, Marca, Grupo, Conjunto, Option } from "@prisma/client";
 import { Badge } from "@/components/Badge";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { DuplicateWarning } from "@/components/DuplicateWarning";
+import { CamposFichaPoder } from "@/components/FichaPoder";
 
 type OptionLite = Pick<Option, "id" | "valor" | "corBg" | "corFg">;
 type MarcaLite = Pick<Marca, "id" | "nome">;
@@ -349,6 +350,53 @@ export function FigureForm({ action, lists, initialData, onCancel }: Props) {
             placeholder="https://..."
           />
         </Field>
+
+        <div className="border-t border-border pt-6">
+          <p className="caption-box mb-4">Ficha de Poder</p>
+          <CamposFichaPoder
+            initial={{
+              articulacao: initialData?.articulacao ?? null,
+              pintura: initialData?.pintura ?? null,
+              acessorios: initialData?.acessorios ?? null,
+              semelhanca: initialData?.semelhanca ?? null,
+              raridade: initialData?.raridade ?? null,
+            }}
+          />
+          <p className="mt-2 text-xs text-muted-foreground">
+            Notas de 1 a 7. Deixe vazio o que ainda não quiser avaliar.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <Field label="Prioridade (wishlist)">
+            <select name="prioridade" defaultValue={initialData?.prioridade ?? ""} className={inputClass}>
+              <option value="">Sem prioridade</option>
+              <option value="alta">Alta</option>
+              <option value="media">Média</option>
+              <option value="baixa">Baixa</option>
+            </select>
+          </Field>
+          <Field label="Era">
+            <select name="era" defaultValue={initialData?.era ?? ""} className={inputClass}>
+              <option value="">Não definida</option>
+              <option value="Ouro">Ouro</option>
+              <option value="Prata">Prata</option>
+              <option value="Bronze">Bronze</option>
+              <option value="Moderna">Moderna</option>
+            </select>
+          </Field>
+          <Field label="Altura (cm)">
+            <input
+              type="number"
+              step="0.1"
+              min="0"
+              name="alturaCm"
+              defaultValue={initialData?.alturaCm ?? ""}
+              placeholder="Ex: 16"
+              className={inputClass}
+            />
+          </Field>
+        </div>
 
         <Field label="Observações">
           <textarea
