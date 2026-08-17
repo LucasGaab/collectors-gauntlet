@@ -120,6 +120,43 @@ export function EscalaBarChart({ data }: { data: ChartDatum[] }) {
   );
 }
 
+/**
+ * Distribuição por era da HQ (item 21). Barras em ordem cronológica, não por
+ * quantidade: o que interessa é a curva do gosto — se o acervo puxa pro
+ * clássico ou pro moderno — e isso some se as barras forem ranqueadas.
+ */
+export function EraBarChart({ data }: { data: ChartDatum[] }) {
+  if (data.length === 0) return null;
+
+  const total = data.reduce((s, d) => s + d.value, 0);
+
+  return (
+    <ChartCard title="Peças por era da HQ">
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <XAxis dataKey="name" tick={axisTick} axisLine={false} tickLine={false} />
+            <YAxis allowDecimals={false} tick={axisTick} axisLine={false} tickLine={false} />
+            <Tooltip
+              contentStyle={tooltipStyle}
+              cursor={{ fill: "rgba(255,255,255,0.04)" }}
+              formatter={(valor) => [
+                `${valor as number} (${Math.round(((valor as number) / total) * 100)}%)`,
+                "Peças",
+              ]}
+            />
+            <Bar dataKey="value" radius={[6, 6, 0, 0]} animationDuration={280}>
+              {data.map((entry) => (
+                <Cell key={entry.name} fill={entry.corBg} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </ChartCard>
+  );
+}
+
 export type TimelineDatum = { mes: string; acumulado: number; novas: number };
 
 /**

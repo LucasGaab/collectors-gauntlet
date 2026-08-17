@@ -73,7 +73,31 @@ function revalidateFigures() {
   revalidatePath("/");
   revalidatePath("/wishlist");
   revalidatePath("/dashboard");
+  revalidatePath("/precos");
+  revalidatePath("/podio");
+  revalidatePath("/personagens");
+  revalidatePath("/personagens/[nome]", "page");
   revalidatePath("/figuras/[id]", "page");
+}
+
+/**
+ * Conferência de preço (item 19): carimba a data de hoje e, quando vem um
+ * valor, atualiza também o preço estimado. É a ação da fila de revisão em
+ * /precos — por isso aceita ser chamada peça a peça, sem passar pelo formulário
+ * inteiro.
+ */
+export async function conferirPreco(id: string, precoEstimado?: number | null) {
+  const data: { precoConferidoEm: Date; precoEstimado?: number | null } = {
+    precoConferidoEm: new Date(),
+  };
+  if (precoEstimado !== undefined) {
+    // Valor inválido não zera o preço que já estava lá: só não mexe nele.
+    if (precoEstimado === null) data.precoEstimado = null;
+    else if (Number.isFinite(precoEstimado) && precoEstimado >= 0) data.precoEstimado = precoEstimado;
+  }
+
+  await prisma.figure.updateMany({ where: { id, ...NOT_DELETED }, data });
+  revalidateFigures();
 }
 
 export async function createFigure(formData: FormData) {

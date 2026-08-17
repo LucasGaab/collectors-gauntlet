@@ -4,7 +4,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Boxes, Heart, LayoutDashboard, Plus, Search, SlidersHorizontal } from "lucide-react";
+import {
+  Boxes,
+  CalendarClock,
+  Heart,
+  LayoutDashboard,
+  Plus,
+  Search,
+  SlidersHorizontal,
+  Trophy,
+  Users,
+} from "lucide-react";
 import { searchFiguresQuick } from "@/lib/actions/figures";
 
 type Figura = {
@@ -20,6 +30,11 @@ const COMANDOS = [
   { label: "Coleção", href: "/", icon: Boxes },
   { label: "Wishlist", href: "/wishlist", icon: Heart },
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  // Telas derivadas do acervo: não cabem na navbar (que já tem 5 no mobile),
+  // então a paleta é o caminho rápido pra elas.
+  { label: "Pódio da coleção", href: "/podio", icon: Trophy },
+  { label: "Multiverso dos personagens", href: "/personagens", icon: Users },
+  { label: "Preços defasados", href: "/precos", icon: CalendarClock },
   { label: "Listas auxiliares", href: "/listas", icon: SlidersHorizontal },
 ] as const;
 

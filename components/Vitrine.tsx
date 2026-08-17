@@ -1,9 +1,18 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronLeft, ChevronRight, Pause, Play, Presentation, X } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Pause,
+  Play,
+  Presentation,
+  Volume2,
+  VolumeX,
+  X,
+} from "lucide-react";
 import { Badge } from "@/components/Badge";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 
@@ -21,22 +30,80 @@ export type PecaVitrine = {
 
 const INTERVALO_SLIDE = 4500;
 
+/** Preferência de som por aparelho (item 33) — sobrepõe o padrão do banco. */
+const SOM_STORAGE_KEY = "gauntlet-vitrine-som";
+
 /**
  * Galeria pública somente-leitura. Não importa nenhuma server action de escrita
  * — não há caminho de edição a partir daqui, nem escondido.
  */
-export function Vitrine({ pecas }: { pecas: PecaVitrine[] }) {
+export function Vitrine({ pecas, somAmbiente = false }: { pecas: PecaVitrine[]; somAmbiente?: boolean }) {
   const [indice, setIndice] = useState<number | null>(null);
   const [apresentando, setApresentando] = useState(false);
   const [pausado, setPausado] = useState(false);
+  const [som, setSom] = useState(somAmbiente);
+  const audioRef = useRef<AudioContext | null>(null);
 
   const aberta = indice !== null;
+
+  // O valor salvo em Preferências é só o padrão; quem manda neste aparelho é a
+  // última escolha feita aqui (localStorage não existe no SSR, daí o efeito).
+  useEffect(() => {
+    const salvo = localStorage.getItem(SOM_STORAGE_KEY);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (salvo !== null) setSom(salvo === "1");
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      void audioRef.current?.close();
+      audioRef.current = null;
+    };
+  }, []);
+
+  /**
+   * Clique curto de vitrine, sintetizado em vez de carregado: um arquivo de
+   * áudio custaria uma requisição e um asset no repositório por um "tec" de
+   * 120ms. Falha em silêncio onde não há WebAudio.
+   */
+  const tocarClique = useCallback(() => {
+    if (!som) return;
+    try {
+      const ctx = (audioRef.current ??= new AudioContext());
+      if (ctx.state === "suspended") void ctx.resume();
+
+      const agora = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const ganho = ctx.createGain();
+      osc.type = "triangle";
+      osc.frequency.setValueAtTime(1250, agora);
+      osc.frequency.exponentialRampToValueAtTime(340, agora + 0.06);
+      ganho.gain.setValueAtTime(0.0001, agora);
+      ganho.gain.exponentialRampToValueAtTime(0.05, agora + 0.006);
+      ganho.gain.exponentialRampToValueAtTime(0.0001, agora + 0.12);
+      osc.connect(ganho).connect(ctx.destination);
+      osc.start(agora);
+      osc.stop(agora + 0.14);
+    } catch {
+      // Sem áudio disponível: a apresentação segue muda.
+    }
+  }, [som]);
+
+  function alternarSom() {
+    setSom((v) => {
+      const proximo = !v;
+      localStorage.setItem(SOM_STORAGE_KEY, proximo ? "1" : "0");
+      return proximo;
+    });
+  }
 
   const irPara = useCallback(
     (delta: number) => {
       setIndice((i) => (i === null ? null : (i + delta + pecas.length) % pecas.length));
+      // O clique é do modo apresentação; navegar peça a peça na lupa é mudo.
+      if (apresentando) tocarClique();
     },
-    [pecas.length],
+    [pecas.length, apresentando, tocarClique],
   );
 
   const fechar = useCallback(() => {
@@ -76,6 +143,9 @@ export function Vitrine({ pecas }: { pecas: PecaVitrine[] }) {
     setIndice(0);
     setApresentando(true);
     setPausado(false);
+    // Primeiro clique dentro do gesto do usuário: é ele que destrava o áudio
+    // no navegador, sem isso o som só sairia a partir da segunda peça.
+    tocarClique();
   }
 
   const atual = indice !== null ? pecas[indice] : null;
@@ -159,6 +229,20 @@ export function Vitrine({ pecas }: { pecas: PecaVitrine[] }) {
                 {indice! + 1} / {pecas.length}
               </span>
               <div className="flex items-center gap-2">
+                {apresentando && (
+                  <button
+                    type="button"
+                    onClick={alternarSom}
+                    aria-pressed={som}
+                    aria-label={som ? "Desligar som" : "Ligar som"}
+                    title={som ? "Desligar som" : "Ligar som"}
+                    className={`grid size-9 place-items-center rounded-full border border-white/20 transition-colors hover:text-primary ${
+                      som ? "text-white" : "text-white/40"
+                    }`}
+                  >
+                    {som ? <Volume2 className="size-4" /> : <VolumeX className="size-4" />}
+                  </button>
+                )}
                 {apresentando && (
                   <button
                     type="button"

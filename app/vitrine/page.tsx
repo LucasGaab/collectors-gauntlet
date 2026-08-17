@@ -66,7 +66,7 @@ export default async function VitrinePage() {
             description="Peças aparecem aqui assim que entram na coleção."
           />
         ) : (
-          <Vitrine pecas={pecas} />
+          <Vitrine pecas={pecas} somAmbiente={prefs.somAmbiente} />
         )}
 
         <p className="mt-16 text-center text-[10px] leading-relaxed text-muted-foreground/70">

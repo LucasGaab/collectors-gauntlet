@@ -2,6 +2,7 @@
 
 import { useRef, useState, useTransition } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Copy, Pencil, Trash2, X } from "lucide-react";
@@ -10,6 +11,8 @@ import { Badge } from "@/components/Badge";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { Lightbox } from "@/components/Lightbox";
 import { FichaPoder } from "@/components/FichaPoder";
+import { FaixaMultiverso } from "@/components/FaixaMultiverso";
+import type { VersaoPersonagem } from "@/lib/insights";
 import { FigureForm, type FigureFormLists } from "@/components/FigureForm";
 import { updateFigure, deleteFigure, restoreFigure, duplicateFigure } from "@/lib/actions/figures";
 import { useToast } from "@/components/Toast";
@@ -34,12 +37,15 @@ export function FigureDetail({
   figure,
   lists,
   optionColors,
+  multiverso = [],
   initialMode = "view",
   isModal = false,
 }: {
   figure: FigureWithRelations;
   lists: FigureFormLists;
   optionColors: OptionColorMap;
+  /** Todas as suas versões deste personagem, esta inclusive (item 20). */
+  multiverso?: VersaoPersonagem[];
   initialMode?: "view" | "edit";
   isModal?: boolean;
 }) {
@@ -236,6 +242,23 @@ export function FigureDetail({
                   </a>
                 )}
               </div>
+
+              {/* Multiverso: só faz sentido com mais de uma versão — com uma
+                  peça só, a faixa seria a própria peça repetida. */}
+              {multiverso.length > 1 && (
+                <div className="glass-card rounded-2xl border border-border p-6">
+                  <div className="mb-4 flex items-baseline justify-between gap-3">
+                    <p className="caption-box">Multiverso de {figure.personagem}</p>
+                    <Link
+                      href={`/personagens/${encodeURIComponent(figure.personagem)}`}
+                      className="shrink-0 text-[10px] font-bold uppercase tracking-widest text-muted-foreground transition-colors hover:text-primary"
+                    >
+                      Ver todas
+                    </Link>
+                  </div>
+                  <FaixaMultiverso versoes={multiverso} atualId={figure.id} />
+                </div>
+              )}
 
               <div className="glass-card rounded-2xl border border-border p-6">
                 <p className="eyebrow mb-4">Conjuntos</p>

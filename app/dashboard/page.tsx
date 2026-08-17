@@ -1,12 +1,18 @@
+import Link from "next/link";
+import { ArrowRight, CalendarClock, Trophy, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { NOT_DELETED, WISHLIST_STATUSES, getMetas } from "@/lib/queries";
+import { getPreferencias } from "@/lib/preferencias";
+import { contarPrecosDefasados, distribuicaoPorEra, getOrcamento, MESES_ATE_DEFASAR } from "@/lib/insights";
 import { MetasPainel } from "@/components/MetasPainel";
+import { OrcamentoPainel } from "@/components/OrcamentoPainel";
 import { AppShell } from "@/components/AppShell";
 import { KpiCard } from "@/components/KpiCard";
 import {
   GrupoPieChart,
   MarcaBarChart,
   EscalaBarChart,
+  EraBarChart,
   TimelineChart,
   type ChartDatum,
   type TimelineDatum,
@@ -17,12 +23,45 @@ export const dynamic = "force-dynamic";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+/** Atalho para as telas derivadas do acervo (pódio, multiverso, preços). */
+function Atalho({
+  href,
+  titulo,
+  descricao,
+  icone: Icone,
+}: {
+  href: string;
+  titulo: string;
+  descricao: string;
+  icone: typeof Trophy;
+}) {
+  return (
+    <Link
+      href={href}
+      className="glass-card group flex items-center gap-4 rounded-2xl border border-border p-5 transition-colors hover:border-primary/60"
+    >
+      <Icone className="size-5 shrink-0 text-primary" strokeWidth={2} />
+      <span className="min-w-0 flex-1">
+        <span className="display-title block truncate text-base transition-colors group-hover:text-primary">
+          {titulo}
+        </span>
+        <span className="block truncate text-[11px] text-muted-foreground">{descricao}</span>
+      </span>
+      <ArrowRight className="size-4 shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" />
+    </Link>
+  );
+}
+
 export default async function DashboardPage() {
-  const [metas, figures, escalaOptions, statusOptions] = await Promise.all([
+  const prefs = await getPreferencias();
+
+  const [metas, figures, escalaOptions, statusOptions, defasados, orcamento] = await Promise.all([
     getMetas(),
     prisma.figure.findMany({ where: NOT_DELETED, include: { marca: true, grupo: true } }),
     prisma.option.findMany({ where: { categoria: "escala" } }),
     prisma.option.findMany({ where: { categoria: "status" }, orderBy: { ordem: "asc" } }),
+    contarPrecosDefasados(),
+    getOrcamento(prefs.orcamentoMensal),
   ]);
 
   const total = figures.length;
@@ -82,6 +121,8 @@ export default async function DashboardPage() {
     (f) => ({ corBg: escalaColorByValor.get(f.escala) ?? "#EFEFEF" }),
   );
 
+  const eraData = distribuicaoPorEra(figures);
+
   return (
     <AppShell title="Dashboard" subtitle="Panorama da coleção">
       <Stagger className="grid grid-cols-2 gap-6 md:grid-cols-4">
@@ -105,7 +146,41 @@ export default async function DashboardPage() {
         ))}
       </Stagger>
 
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <Atalho
+          href="/podio"
+          titulo="Pódio"
+          descricao="As mais caras, as mais caçadas, as melhores notas"
+          icone={Trophy}
+        />
+        <Atalho
+          href="/personagens"
+          titulo="Multiverso"
+          descricao="Suas versões de cada personagem, lado a lado"
+          icone={Users}
+        />
+        <Atalho
+          href="/precos"
+          titulo="Preços defasados"
+          descricao={
+            defasados === 0
+              ? `Tudo conferido nos últimos ${MESES_ATE_DEFASAR} meses`
+              : `${defasados} ${defasados === 1 ? "peça" : "peças"} sem conferência há mais de ${MESES_ATE_DEFASAR} meses`
+          }
+          icone={CalendarClock}
+        />
+      </div>
+
       <TimelineChart data={timelineData} />
+
+      {orcamento ? (
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <OrcamentoPainel orcamento={orcamento} />
+          <EraBarChart data={eraData} />
+        </div>
+      ) : (
+        <EraBarChart data={eraData} />
+      )}
 
       <MetasPainel grupos={metas.grupos} conjuntos={metas.conjuntos} />
 

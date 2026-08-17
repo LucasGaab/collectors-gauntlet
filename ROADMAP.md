@@ -23,6 +23,7 @@ Os números abaixo são os IDs desse documento.
 - Navegação mobile (navbar inferior, filtros roláveis, faixa de marca no topo).
 - Metas de coleção por Grupo e Conjunto.
 - Vitrine pública (`/vitrine`) com modo apresentação, e PWA.
+- Telas derivadas do acervo: `/podio`, `/precos` e `/personagens`.
 
 ### Da lista de ideias
 | # | Item |
@@ -31,18 +32,20 @@ Os números abaixo são os IDs desse documento.
 | 05 | Balão de fala nas observações (`balao-fala`) |
 | 09 | Grão de papel |
 | 10 | Ficha de Poder |
+| 13 | Pódio da coleção (`/podio`) |
 | 14 | Tempo de caçada |
 | 15 | Prioridade na wishlist |
+| 16 | Orçamento mensal (painel no dashboard) |
+| 19 | Preços defasados (`/precos`, com fila de revisão) |
+| 20 | Multiverso do personagem (`/personagens` + faixa na ficha) |
+| 21 | Eras da HQ (gráfico no dashboard) |
+| 33 | Som ambiente (clique sintetizado na apresentação) |
 | 39 | Temas de universo |
 | 40 | Nome da coleção |
 | 41 | Densidade do catálogo |
 
-### Parcial — campo existe, falta o uso
-| # | Item | O que falta |
-| --- | --- | --- |
-| 16 | Orçamento mensal | Consumir `Preferencias.orcamentoMensal` no dashboard |
-| 21 | Eras da HQ | Gráfico/agrupamento por `Figure.era` |
-| 33 | Som ambiente | Tocar o áudio no modo apresentação |
+Os cálculos de 13, 16, 19, 20 e 21 vivem em `lib/insights.ts` — leituras
+derivadas, sem escrita, todas respeitando `NOT_DELETED` e `WISHLIST_STATUSES`.
 
 ## Pendente
 
@@ -56,10 +59,7 @@ Os números abaixo são os IDs desse documento.
 | 08 | Selo de raridade em relevo |
 | 11 | Patente de colecionador |
 | 12 | Medalhas |
-| 13 | Pódio da coleção |
 | 18 | Peça do dia |
-| 19 | Preços defasados |
-| 20 | Multiverso do personagem |
 | 22 | Mapa de calor do acervo |
 | 23 | Buracos na coleção |
 | 28 | Cartão colecionável |
@@ -73,8 +73,9 @@ Os números abaixo são os IDs desse documento.
 | 43 | Ícone por grupo |
 | 44 | O estalo |
 
-**Sugestão de ordem:** 19, 20 e 13 primeiro — os campos já existem no banco e a
-Ficha de Poder já fornece os dados, então são telas novas sem migration.
+**Sugestão de ordem:** 12 (Medalhas) e 11 (Patente) — a Ficha de Poder, as metas
+e o tempo de caçada já dão todos os critérios, então é regra em cima de dado que
+já existe. Depois 34 e 43, que só esperam o campo migrado virar UI.
 
 ## Campos já migrados e ainda sem uso
 
@@ -83,10 +84,14 @@ Estes existem no schema e não custam migration para quem for implementar:
 - `Figure.rascunho` → item 34
 - `Figure.corDominante` → busca por cor (item 25 do documento)
 - `Figure.alturaCm` → comparação de escala (item 26)
-- `Figure.era` → item 21
 - `Grupo.icone` → item 43
-- `Preferencias.orcamentoMensal` → item 16
-- `Preferencias.somAmbiente` → item 33
+
+## Onde as telas novas moram
+
+`/podio`, `/precos` e `/personagens` **não estão na sidebar** — a navbar do
+mobile já tem 5 itens e não comporta mais. Chega-se nelas pelos atalhos no topo
+do dashboard e pela paleta de comandos (⌘K). Não remova os atalhos sem dar outro
+caminho: hoje são a única porta de entrada.
 
 ## Armadilhas conhecidas
 
@@ -103,3 +108,17 @@ Estes existem no schema e não custam migration para quem for implementar:
   `WISHLIST_STATUSES` e `getCollectionStatuses()`.
 - **O seed não recria figuras** com o banco populado (proteção contra apagar a
   coleção). Use `SEED_RESET=1` para forçar.
+- **Todo export de um módulo `"use client"` vira referência de cliente.** Não dá
+  pra chamar do servidor nem uma função pura que more nele. Por isso os helpers
+  da Ficha de Poder saíram de `components/FichaPoder.tsx` para `lib/ficha.ts`: o
+  pódio ranqueia por `mediaFicha()` durante o render de servidor. Regra: helper
+  usado dos dois lados nasce em `lib/`, nunca no componente.
+- **Rota nova que lê figuras precisa entrar em `revalidateFigures()`** (em
+  `lib/actions/figures.ts`). Sem isso a tela congela depois de qualquer edição —
+  e o sintoma (dado velho só numa tela) não aponta pra causa.
+- **Dois `next dev` no mesmo diretório não coexistem.** O Next 16 recusa o
+  segundo com *"Another next dev server is already running"*, mesmo em outra
+  porta, porque o `.next` é compartilhado. Com duas sessões de trabalho no mesmo
+  repo, só uma sobe servidor — a outra verifica com `npm run build`.
+- **Plural em pt-BR não sai de sufixo.** `versão`/`versões` troca o miolo da
+  palavra; concatenar sufixo gera "versãoões". Escreva as duas formas inteiras.

@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { buildOptionColorMap, getFilterOptions, NOT_DELETED } from "@/lib/queries";
+import { getVersoesDoPersonagem } from "@/lib/insights";
 import { AppShell } from "@/components/AppShell";
 import { FigureDetail } from "@/components/FigureDetail";
 
@@ -26,6 +27,7 @@ export default async function FiguraPage({ params, searchParams }: Props) {
   if (!figure) notFound();
 
   const optionColors = buildOptionColorMap(lists.allOptions);
+  const multiverso = await getVersoesDoPersonagem(figure.personagem);
 
   return (
     <AppShell title={figure.nome} subtitle={`${figure.marca.nome} • ${figure.linha ?? "Sem linha"}`}>
@@ -34,6 +36,7 @@ export default async function FiguraPage({ params, searchParams }: Props) {
           figure={figure}
           lists={lists}
           optionColors={optionColors}
+          multiverso={multiverso}
           initialMode={edit ? "edit" : "view"}
           isModal={false}
         />

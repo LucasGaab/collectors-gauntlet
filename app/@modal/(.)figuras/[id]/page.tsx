@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import { buildOptionColorMap, getFilterOptions, NOT_DELETED } from "@/lib/queries";
+import { getVersoesDoPersonagem } from "@/lib/insights";
 import { FigureDetail } from "@/components/FigureDetail";
 import { Modal } from "@/components/Modal";
 
@@ -39,6 +40,7 @@ export default async function FiguraModalPage({ params, searchParams }: Props) {
   if (!figure) notFound();
 
   const optionColors = buildOptionColorMap(lists.allOptions);
+  const multiverso = await getVersoesDoPersonagem(figure.personagem);
 
   return (
     <Modal currentId={figure.id}>
@@ -46,6 +48,7 @@ export default async function FiguraModalPage({ params, searchParams }: Props) {
         figure={figure}
         lists={lists}
         optionColors={optionColors}
+        multiverso={multiverso}
         initialMode={edit ? "edit" : "view"}
         isModal
       />
