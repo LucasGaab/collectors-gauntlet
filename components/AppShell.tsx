@@ -18,7 +18,6 @@ import { LogoMark, LogoHorizontal } from "@/components/LogoMark";
 import { MobileBrandBar } from "@/components/MobileBrandBar";
 import { CommandPalette } from "@/components/CommandPalette";
 import { SfxLayer } from "@/components/Sfx";
-import { ViradaDePagina } from "@/components/ViradaDePagina";
 
 const NAV = [
   { to: "/", label: "Coleção", icon: Boxes },
@@ -151,7 +150,6 @@ export function AppShell({
       <MobileBrandBar />
       <CommandPalette />
       <SfxLayer />
-      <ViradaDePagina />
 
       {/* Navbar inferior — só no mobile. pb com safe-area pro indicador do iPhone. */}
       <nav className="fixed inset-x-0 bottom-0 z-40 flex border-t border-border bg-surface pb-[env(safe-area-inset-bottom)] md:hidden">

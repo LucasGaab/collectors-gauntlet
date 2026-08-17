@@ -47,6 +47,14 @@ Os números abaixo são os IDs desse documento.
 Os cálculos de 13, 16, 19, 20 e 21 vivem em `lib/insights.ts` — leituras
 derivadas, sem escrita, todas respeitando `NOT_DELETED` e `WISHLIST_STATUSES`.
 
+## Descartado por decisão do usuário
+
+| # | Item | Motivo |
+| --- | --- | --- |
+| 07 | Transição de virada de página | O retângulo atravessando a tela a cada
+navegação incomodou mais do que somou. Removido inteiro (componente e keyframe);
+não reintroduzir sem pedido explícito. |
+
 ## Pendente
 
 | # | Item |
@@ -55,7 +63,6 @@ derivadas, sem escrita, todas respeitando `NOT_DELETED` e `WISHLIST_STATUSES`.
 | 02 | Onomatopeias nas ações |
 | 04 | Capa de revista gerada |
 | 06 | Cursor manopla |
-| 07 | Transição de virada de página |
 | 08 | Selo de raridade em relevo |
 | 11 | Patente de colecionador |
 | 12 | Medalhas |

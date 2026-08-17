@@ -455,16 +455,6 @@ input[type="color"] {
   }
 }
 
-/* Virada de página (item 07): o sulco preto atravessa a tela na troca de rota. */
-@keyframes varrer-painel {
-  0% {
-    transform: translateX(-100%) skewX(-8deg);
-  }
-  100% {
-    transform: translateX(140%) skewX(-8deg);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .selo-relevo {
     animation: none;
