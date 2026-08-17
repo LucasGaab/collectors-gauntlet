@@ -4,6 +4,14 @@ import { useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useToast } from "@/components/Toast";
 import { Confetti } from "@/components/Confetti";
+import { sfx, type Onomatopeia } from "@/components/Sfx";
+
+/** Letreiro por tipo de evento (item 02). */
+const SFX: Record<string, Onomatopeia> = {
+  criada: "THWIP",
+  atualizada: "THWIP",
+  conquistada: "KRAKOOM",
+};
 
 const MESSAGES: Record<string, string> = {
   criada: "Figura adicionada à coleção.",
@@ -25,6 +33,7 @@ export function ToastFromQuery() {
   useEffect(() => {
     if (!toastKey) return;
     showToast(MESSAGES[toastKey] ?? "Feito.");
+    if (SFX[toastKey]) sfx(SFX[toastKey]);
 
     // A limpeza do ?toast desmonta o confete, então ela espera a animação.
     // Sem estado local: o próprio parâmetro da URL é a fonte da verdade.

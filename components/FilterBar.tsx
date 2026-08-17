@@ -4,7 +4,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, LayoutGrid, Rows3, ChevronDown, X } from "lucide-react";
+import { Search, LayoutGrid, Rows3, BookOpen, ChevronDown, X } from "lucide-react";
 
 type OptionLike = { id?: string; nome?: string; valor?: string; corBg: string; corFg: string };
 
@@ -159,13 +159,15 @@ function OptionList({
   );
 }
 
+export type Visao = "table" | "grid" | "hq";
+
 export function FilterBar({
   groups,
   view,
   count,
 }: {
   groups: FilterGroup[];
-  view: "table" | "grid";
+  view: Visao;
   count: number;
 }) {
   const router = useRouter();
@@ -212,7 +214,7 @@ export function FilterBar({
     }, 300);
   }
 
-  function setView(next: "table" | "grid") {
+  function setView(next: Visao) {
     pushParams((params) => params.set("view", next));
   }
 
@@ -253,6 +255,18 @@ export function FilterBar({
             }`}
           >
             <LayoutGrid className="size-3.5" /> <span className="hidden md:inline">Catálogo</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("hq")}
+            aria-label="Ver como página de quadrinho"
+            className={`flex items-center gap-2 rounded-md border px-2.5 py-2 text-[10px] font-bold uppercase tracking-widest transition-colors md:px-4 ${
+              view === "hq"
+                ? "border-border bg-surface-high text-foreground"
+                : "border-transparent text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            <BookOpen className="size-3.5" /> <span className="hidden md:inline">Página HQ</span>
           </button>
           <button
             type="button"

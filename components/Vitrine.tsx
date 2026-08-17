@@ -175,7 +175,7 @@ export function Vitrine({ pecas, somAmbiente = false }: { pecas: PecaVitrine[]; 
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25, delay: Math.min(i * 0.02, 0.4) }}
-            className="vitrine-spot group relative overflow-hidden rounded-xl border border-border bg-surface text-left transition-transform duration-300 hover:-translate-y-1"
+            className="vitrine-spot cursor-manopla group relative overflow-hidden rounded-xl border border-border bg-surface text-left transition-transform duration-300 hover:-translate-y-1"
             onMouseMove={(e) => {
               const r = e.currentTarget.getBoundingClientRect();
               e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);

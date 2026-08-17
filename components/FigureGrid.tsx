@@ -7,6 +7,7 @@ import type { Figure, Marca, Grupo } from "@prisma/client";
 import { Badge } from "@/components/Badge";
 import { DeleteFigureButton } from "@/components/DeleteFigureButton";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import { SeloRaridade } from "@/components/SeloRaridade";
 import type { OptionColorMap } from "@/components/FigureTable";
 import { Stagger, StaggerItem } from "@/components/motion";
 
@@ -52,7 +53,7 @@ export function FigureGrid({
               e.currentTarget.style.setProperty("--mx", `${e.clientX - r.left}px`);
               e.currentTarget.style.setProperty("--my", `${e.clientY - r.top}px`);
             }}
-            className={`vitrine-spot relative overflow-hidden rounded-xl border bg-surface transition-transform duration-300 group-hover:-translate-y-1 ${
+            className={`vitrine-spot cursor-manopla relative overflow-hidden rounded-xl border bg-surface transition-transform duration-300 group-hover:-translate-y-1 ${
               isSelected ? "border-primary" : "border-border"
             }`}
           >
@@ -71,6 +72,7 @@ export function FigureGrid({
                   <ImagePlaceholder />
                 )}
               </Link>
+              <SeloRaridade raridade={f.raridade} className="right-2 top-10" />
               <div className="pointer-events-none absolute left-2 bottom-2 z-10 flex flex-wrap gap-1">
                 <Badge label={f.status} {...colorFor("status", f.status)} />
                 {ehNova(f.createdAt) && (

@@ -5,12 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { Copy, Pencil, Trash2, X } from "lucide-react";
+import { BookImage, Copy, Pencil, Trash2, X } from "lucide-react";
 import type { Figure, Marca, Grupo, Conjunto } from "@prisma/client";
 import { Badge } from "@/components/Badge";
 import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { Lightbox } from "@/components/Lightbox";
 import { FichaPoder } from "@/components/FichaPoder";
+import { sfx } from "@/components/Sfx";
 import { FaixaMultiverso } from "@/components/FaixaMultiverso";
 import type { VersaoPersonagem } from "@/lib/insights";
 import { FigureForm, type FigureFormLists } from "@/components/FigureForm";
@@ -67,6 +68,7 @@ export function FigureDetail({
 
   // Vai pra lixeira e oferece "Desfazer" no toast — sem confirm() bloqueante.
   function handleDelete() {
+    sfx("POOF");
     startTransition(async () => {
       await deleteFigure(figure.id);
       showToast(`"${figure.nome}" removida da coleção.`, "success", {
@@ -83,6 +85,7 @@ export function FigureDetail({
     startTransition(async () => {
       const copy = await duplicateFigure(figure.id);
       if (!copy) return;
+      sfx("SNIKT");
       showToast("Cópia criada — ajuste os dados da variante e salve.");
       // Mantém o contexto atual (modal continua modal, página continua página).
       router.replace(`/figuras/${copy.id}?edit=1`, { scroll: false });
@@ -121,6 +124,17 @@ export function FigureDetail({
               >
                 <Pencil className="size-3.5" /> Editar
               </button>
+              {/* Capa de revista gerada (item 04): abre a imagem pronta pra salvar. */}
+              <a
+                href={`/api/capa/${figure.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Gerar capa de revista"
+                title="Gerar capa de revista"
+                className="grid size-9 place-items-center rounded-full border border-border text-muted-foreground transition-colors hover:border-gold/60 hover:text-gold"
+              >
+                <BookImage className="size-4" />
+              </a>
               <button
                 type="button"
                 onClick={handleDuplicate}

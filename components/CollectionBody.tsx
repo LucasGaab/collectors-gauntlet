@@ -7,6 +7,7 @@ import { FigureGrid } from "@/components/FigureGrid";
 import { ViewTransition } from "@/components/ViewTransition";
 import { BulkActionBar } from "@/components/BulkActionBar";
 import { CompararModal } from "@/components/CompararModal";
+import { PaginaHQ } from "@/components/PaginaHQ";
 import { NAV_IDS_STORAGE_KEY } from "@/lib/navIds";
 
 /**
@@ -23,7 +24,7 @@ export function CollectionBody({
   classeGrid,
 }: {
   figures: FigureRow[];
-  view: "table" | "grid";
+  view: "table" | "grid" | "hq";
   optionColors: OptionColorMap;
   searchParamsString: string;
   statuses: { id: string; valor: string }[];
@@ -62,7 +63,11 @@ export function CollectionBody({
   return (
     <>
       <ViewTransition viewKey={view}>
-        {view === "table" ? (
+        {view === "hq" ? (
+          // A página de HQ é uma visão de leitura: sem seleção em lote, que
+          // exigiria caixas de marcar por cima da diagramação e a quebraria.
+          <PaginaHQ figures={figures} optionColors={optionColors} />
+        ) : view === "table" ? (
           <FigureTable
             figures={figures}
             searchParamsString={searchParamsString}

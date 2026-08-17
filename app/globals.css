@@ -389,3 +389,93 @@ input[type="color"] {
     border-top: 12px solid var(--surface-high);
   }
 }
+
+/* ── Identidade de quadrinho (itens 01, 02, 06, 07, 08) ─────────────────── */
+
+/* Retícula Ben-Day: a trama de pontos da impressão em quadrinho. */
+@utility reticula {
+  background-image: radial-gradient(
+    color-mix(in oklab, var(--primary) 55%, transparent) 1px,
+    transparent 1.4px
+  );
+  background-size: 6px 6px;
+}
+
+/* Painel de HQ: canto reto e sulco preto grosso, o oposto do card arredondado. */
+@utility painel-hq {
+  position: relative;
+  border: 3px solid #000;
+  background: var(--surface);
+  box-shadow: 0 0 0 1px var(--border) inset;
+  overflow: hidden;
+}
+
+/*
+ * Letreiro de onomatopeia. A animação é uma só: entra girado e pequeno, estufa
+ * e some. `will-change` evita repintura do texto com contorno, que é pesado.
+ */
+@utility letreiro-sfx {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--gold);
+  -webkit-text-stroke: 3px #000;
+  paint-order: stroke fill;
+  text-shadow: 6px 6px 0 #000;
+  will-change: transform, opacity;
+}
+
+/* Selo de raridade em relevo (item 08). O brilho gira devagar, como metal. */
+@utility selo-relevo {
+  background:
+    conic-gradient(
+      from var(--angulo, 0deg),
+      color-mix(in oklab, var(--gold) 92%, #fff) 0deg,
+      color-mix(in oklab, var(--gold) 55%, #000) 120deg,
+      color-mix(in oklab, var(--gold) 96%, #fff) 240deg,
+      color-mix(in oklab, var(--gold) 55%, #000) 360deg
+    );
+  border: 2px solid #000;
+  box-shadow:
+    inset 0 1px 2px color-mix(in oklab, #fff 55%, transparent),
+    inset 0 -2px 3px color-mix(in oklab, #000 45%, transparent),
+    0 2px 6px color-mix(in oklab, #000 55%, transparent);
+  animation: girar-selo 6s linear infinite;
+}
+
+@property --angulo {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes girar-selo {
+  to {
+    --angulo: 360deg;
+  }
+}
+
+/* Virada de página (item 07): o sulco preto atravessa a tela na troca de rota. */
+@keyframes varrer-painel {
+  0% {
+    transform: translateX(-100%) skewX(-8deg);
+  }
+  100% {
+    transform: translateX(140%) skewX(-8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selo-relevo {
+    animation: none;
+  }
+}
+
+/*
+ * Cursor manopla (item 06). Aplicado só em áreas de vitrine — trocar o cursor
+ * do app inteiro atrapalha seleção de texto e campos de formulário. O par de
+ * números é o ponto ativo; `pointer` é o fallback se o PNG não carregar.
+ */
+@utility cursor-manopla {
+  cursor: url("/cursor-manopla.png") 15 4, pointer;
+}

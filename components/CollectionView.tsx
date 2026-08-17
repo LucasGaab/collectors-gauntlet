@@ -9,7 +9,7 @@ import {
   type FigureSearchParams,
 } from "@/lib/queries";
 import { AppShell } from "@/components/AppShell";
-import { FilterBar, type FilterGroup } from "@/components/FilterBar";
+import { FilterBar, type FilterGroup, type Visao } from "@/components/FilterBar";
 import { CollectionBody } from "@/components/CollectionBody";
 import { ToastFromQuery } from "@/components/ToastFromQuery";
 import { EmptyState } from "@/components/EmptyState";
@@ -55,8 +55,9 @@ export async function CollectionView({
 
   const optionColors = buildOptionColorMap(filterOptions.allOptions);
   // Catálogo é o padrão: a vitrine com foto é a leitura natural da coleção.
-  // A tabela continua a um clique, e o ?view=table na URL manda.
-  const view = params.view === "table" ? "table" : "grid";
+  // Tabela e Página HQ ficam a um clique, e o ?view= na URL manda.
+  const view: Visao =
+    params.view === "table" ? "table" : params.view === "hq" ? "hq" : "grid";
 
   const searchParamsString = new URLSearchParams(
     Object.entries(params).filter(([, v]) => v !== undefined) as [string, string][],

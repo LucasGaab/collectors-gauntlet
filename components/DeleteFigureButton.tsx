@@ -4,6 +4,7 @@ import { useTransition } from "react";
 import { Trash2 } from "lucide-react";
 import { deleteFigure, restoreFigure } from "@/lib/actions/figures";
 import { useToast } from "@/components/Toast";
+import { sfx } from "@/components/Sfx";
 
 export function DeleteFigureButton({
   id,
@@ -19,6 +20,7 @@ export function DeleteFigureButton({
 
   // Sem confirm(): a exclusão vai pra lixeira e o toast oferece "Desfazer".
   function handleDelete() {
+    sfx("POOF");
     startTransition(async () => {
       await deleteFigure(id);
       showToast(`"${nome}" removida da coleção.`, "success", {
