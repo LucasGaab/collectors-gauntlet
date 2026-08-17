@@ -2,6 +2,8 @@ import { AppShell } from "@/components/AppShell";
 import { PrecosPainel } from "@/components/PrecosPainel";
 import { getPrecosDefasados, MESES_ATE_DEFASAR } from "@/lib/insights";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 /**
@@ -10,6 +12,9 @@ export const dynamic = "force-dynamic";
  * envelhece igual, e é justamente o que decide a próxima compra.
  */
 export default async function PrecosPage() {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const pecas = await getPrecosDefasados();
 
   return (

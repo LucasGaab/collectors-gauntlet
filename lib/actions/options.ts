@@ -1,10 +1,13 @@
 "use server";
 
+import { exigirSessao } from "@/lib/auth";
+
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import type { OptionCategoria } from "@/lib/optionCategories";
 
 export async function createOption(formData: FormData) {
+  await exigirSessao();
   const categoria = formData.get("categoria") as OptionCategoria;
   const valor = (formData.get("valor") as string).trim();
   const corBg = formData.get("corBg") as string;
@@ -18,6 +21,7 @@ export async function createOption(formData: FormData) {
 }
 
 export async function updateOption(id: string, formData: FormData) {
+  await exigirSessao();
   const corBg = formData.get("corBg") as string;
   const corFg = formData.get("corFg") as string;
   const novoValor = (formData.get("valor") as string).trim();
@@ -41,6 +45,7 @@ export async function updateOption(id: string, formData: FormData) {
 }
 
 export async function deleteOption(id: string): Promise<{ error?: string }> {
+  await exigirSessao();
   const existing = await prisma.option.findUniqueOrThrow({ where: { id } });
 
   const emUso = await prisma.figure.count({

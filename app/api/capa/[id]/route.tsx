@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
 import sharp from "sharp";
 import { prisma } from "@/lib/prisma";
+import { exigirSessao } from "@/lib/auth";
 import { NOT_DELETED } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -47,6 +48,8 @@ async function fotoComoDataUri(imagemUrl: string | null): Promise<string | null>
 }
 
 export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
+  await exigirSessao();
+
   const { id } = await params;
 
   const peca = await prisma.figure.findFirst({

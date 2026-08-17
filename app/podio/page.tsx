@@ -6,6 +6,8 @@ import { EmptyState } from "@/components/EmptyState";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { getPodio, type ItemPodio, type Ranking } from "@/lib/insights";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 /** Ouro, prata e bronze — a medalha é a posição, não o valor do critério. */
@@ -72,6 +74,9 @@ function CartaoRanking({ ranking }: { ranking: Ranking }) {
  * dela. Rankings sem nenhuma peça pontuando não são renderizados.
  */
 export default async function PodioPage() {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const rankings = await getPodio();
 
   return (

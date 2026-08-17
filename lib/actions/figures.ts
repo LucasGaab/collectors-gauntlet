@@ -1,5 +1,7 @@
 "use server";
 
+import { exigirSessao } from "@/lib/auth";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
@@ -87,6 +89,7 @@ function revalidateFigures() {
  * inteiro.
  */
 export async function conferirPreco(id: string, precoEstimado?: number | null) {
+  await exigirSessao();
   const data: { precoConferidoEm: Date; precoEstimado?: number | null } = {
     precoConferidoEm: new Date(),
   };
@@ -101,6 +104,7 @@ export async function conferirPreco(id: string, precoEstimado?: number | null) {
 }
 
 export async function createFigure(formData: FormData) {
+  await exigirSessao();
   const data = figureDataFromForm(formData);
   const conjuntoIds = formData.getAll("conjuntoIds") as string[];
   const imageFile = formData.get("imagem") as File | null;
@@ -120,6 +124,7 @@ export async function createFigure(formData: FormData) {
 }
 
 export async function updateFigure(id: string, formData: FormData) {
+  await exigirSessao();
   const data = figureDataFromForm(formData);
   const conjuntoIds = formData.getAll("conjuntoIds") as string[];
   const imageFile = formData.get("imagem") as File | null;
@@ -168,6 +173,7 @@ export async function updateFigure(id: string, formData: FormData) {
  * desfazer) e só apaga de verdade o que já passou de TRASH_TTL_MS.
  */
 export async function deleteFigure(id: string) {
+  await exigirSessao();
   await prisma.figure.updateMany({
     where: { id, deletedAt: null },
     data: { deletedAt: new Date() },
@@ -177,6 +183,7 @@ export async function deleteFigure(id: string) {
 }
 
 export async function restoreFigure(id: string) {
+  await exigirSessao();
   await prisma.figure.updateMany({ where: { id }, data: { deletedAt: null } });
   revalidateFigures();
 }
@@ -202,6 +209,7 @@ async function purgeExpiredTrash() {
  * do modal interceptado, onde um redirect de servidor perderia o overlay).
  */
 export async function duplicateFigure(id: string): Promise<{ id: string } | null> {
+  await exigirSessao();
   const source = await prisma.figure.findFirst({
     where: { id, ...NOT_DELETED },
     include: { conjuntos: { select: { id: true } } },
@@ -240,6 +248,7 @@ export async function duplicateFigure(id: string): Promise<{ id: string } | null
 
 /** Edição em lote: aplica um status a várias peças de uma vez. */
 export async function bulkUpdateStatus(ids: string[], status: string) {
+  await exigirSessao();
   if (ids.length === 0 || !status) return;
 
   // Só aceita status que existe nas Listas Auxiliares (nada de valor arbitrário).
@@ -252,6 +261,7 @@ export async function bulkUpdateStatus(ids: string[], status: string) {
 
 /** Exclusão em lote (soft delete), usada pela barra de seleção. */
 export async function bulkDeleteFigures(ids: string[]) {
+  await exigirSessao();
   if (ids.length === 0) return;
   await prisma.figure.updateMany({
     where: { id: { in: ids }, deletedAt: null },
@@ -262,6 +272,7 @@ export async function bulkDeleteFigures(ids: string[]) {
 }
 
 export async function bulkRestoreFigures(ids: string[]) {
+  await exigirSessao();
   if (ids.length === 0) return;
   await prisma.figure.updateMany({ where: { id: { in: ids } }, data: { deletedAt: null } });
   revalidateFigures();
@@ -269,6 +280,7 @@ export async function bulkRestoreFigures(ids: string[]) {
 
 /** Busca enxuta para a paleta de comandos (⌘K). Só os campos que ela exibe. */
 export async function searchFiguresQuick(termo: string) {
+  await exigirSessao();
   const q = termo.trim();
   if (q.length < 2) return [];
 
@@ -289,6 +301,7 @@ export async function searchFiguresQuick(termo: string) {
  * SQLite não tem trigram, e pro tamanho de uma coleção pessoal isso basta.
  */
 export async function findSimilarFigures(nome: string, personagem: string) {
+  await exigirSessao();
   const n = nome.trim();
   const p = personagem.trim();
   if (n.length < 3 && p.length < 3) return [];

@@ -7,6 +7,8 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { getVersoesDoPersonagem } from "@/lib/insights";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -19,6 +21,9 @@ type Props = { params: Promise<{ nome: string }> };
  * isso a busca é case-insensitive em vez de igualdade exata.
  */
 export default async function PersonagemPage({ params }: Props) {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const { nome } = await params;
   const personagem = decodeURIComponent(nome);
   const versoes = await getVersoesDoPersonagem(personagem);

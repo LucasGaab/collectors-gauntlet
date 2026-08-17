@@ -1,5 +1,7 @@
 "use server";
 
+import { exigirSessao } from "@/lib/auth";
+
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { PREFS_ID, TEMAS } from "@/lib/preferencias";
@@ -13,6 +15,7 @@ function numOrNull(v: FormDataEntryValue | null): number | null {
 
 /** Salva as preferências. Revalida tudo: tema e densidade afetam todas as telas. */
 export async function salvarPreferencias(formData: FormData) {
+  await exigirSessao();
   const temaBruto = (formData.get("tema") ?? "").toString();
   // Só aceita tema conhecido — o valor vira atributo no <html>.
   const tema = TEMAS.some((t) => t.id === temaBruto) ? temaBruto : "obsidian";

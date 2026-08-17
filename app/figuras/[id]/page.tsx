@@ -5,6 +5,8 @@ import { getVersoesDoPersonagem } from "@/lib/insights";
 import { AppShell } from "@/components/AppShell";
 import { FigureDetail } from "@/components/FigureDetail";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 type Props = {
@@ -13,6 +15,9 @@ type Props = {
 };
 
 export default async function FiguraPage({ params, searchParams }: Props) {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const { id } = await params;
   const { edit } = await searchParams;
 

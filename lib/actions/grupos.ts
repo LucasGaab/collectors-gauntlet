@@ -1,5 +1,7 @@
 "use server";
 
+import { exigirSessao } from "@/lib/auth";
+
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
@@ -12,6 +14,7 @@ function metaFromForm(formData: FormData): number | null {
 }
 
 export async function createGrupo(formData: FormData) {
+  await exigirSessao();
   const nome = (formData.get("nome") as string).trim();
   const corBg = formData.get("corBg") as string;
   const corFg = formData.get("corFg") as string;
@@ -24,6 +27,7 @@ export async function createGrupo(formData: FormData) {
 }
 
 export async function updateGrupo(id: string, formData: FormData) {
+  await exigirSessao();
   const nome = (formData.get("nome") as string).trim();
   const corBg = formData.get("corBg") as string;
   const corFg = formData.get("corFg") as string;
@@ -38,6 +42,7 @@ export async function updateGrupo(id: string, formData: FormData) {
 }
 
 export async function deleteGrupo(id: string): Promise<{ error?: string }> {
+  await exigirSessao();
   const emUso = await prisma.figure.count({ where: { grupoId: id } });
   if (emUso > 0) {
     return { error: `Não é possível remover: ${emUso} figura(s) usam este grupo.` };

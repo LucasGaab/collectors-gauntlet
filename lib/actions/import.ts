@@ -1,5 +1,7 @@
 "use server";
 
+import { exigirSessao } from "@/lib/auth";
+
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/prisma";
 import { parseCsv, rowsToRecords } from "@/lib/csv";
@@ -58,6 +60,7 @@ function parseDate(v: string): Date | null {
  * - `imagemUrl` é preservado como texto; a importação não baixa nem gera imagem.
  */
 export async function importFiguresCsv(formData: FormData): Promise<ImportResult> {
+  await exigirSessao();
   const file = formData.get("arquivo") as File | null;
   const result: ImportResult = { created: 0, updated: 0, skipped: 0, errors: [] };
 

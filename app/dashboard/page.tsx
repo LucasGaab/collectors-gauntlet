@@ -19,6 +19,8 @@ import {
 } from "@/components/DashboardCharts";
 import { Stagger, StaggerItem } from "@/components/motion";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -53,6 +55,9 @@ function Atalho({
 }
 
 export default async function DashboardPage() {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const prefs = await getPreferencias();
 
   const [metas, figures, escalaOptions, statusOptions, defasados, orcamento] = await Promise.all([

@@ -1,6 +1,8 @@
 import { getCollectionStatuses } from "@/lib/queries";
 import { CollectionView, normalizeSearchParams } from "@/components/CollectionView";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 type Props = {
@@ -8,6 +10,9 @@ type Props = {
 };
 
 export default async function HomePage({ searchParams }: Props) {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const [rawParams, scopeStatuses] = await Promise.all([searchParams, getCollectionStatuses()]);
   const params = normalizeSearchParams(rawParams);
 

@@ -5,6 +5,8 @@ import { getVersoesDoPersonagem } from "@/lib/insights";
 import { FigureDetail } from "@/components/FigureDetail";
 import { Modal } from "@/components/Modal";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 /**
@@ -26,6 +28,9 @@ type Props = {
 };
 
 export default async function FiguraModalPage({ params, searchParams }: Props) {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const { id } = await params;
   const { edit } = await searchParams;
 

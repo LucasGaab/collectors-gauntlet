@@ -6,6 +6,8 @@ import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 import { Stagger, StaggerItem } from "@/components/motion";
 import { getMultiverso } from "@/lib/insights";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -15,6 +17,9 @@ const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", curren
  * versão — quem tem uma peça só já aparece na Coleção e não ganha nada aqui.
  */
 export default async function PersonagensPage() {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const personagens = await getMultiverso();
 
   return (

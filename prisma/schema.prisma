@@ -140,3 +140,26 @@ model Preferencias {
   somAmbiente     Boolean  @default(false)
   atualizadoEm    DateTime @updatedAt
 }
+
+/// Usuário do painel. O app é single-user, mas a tabela permite trocar a senha
+/// sem redeploy — o que uma variável de ambiente com hash não permitiria.
+model Usuario {
+  id        String    @id @default(cuid())
+  login     String    @unique
+  senhaHash String
+  criadoEm  DateTime  @default(now())
+  sessoes   Sessao[]
+}
+
+/// Sessão persistida. O cookie carrega só o token opaco; validade e revogação
+/// vivem aqui, então dá pra encerrar sessão em todos os aparelhos.
+model Sessao {
+  token      String   @id
+  usuarioId  String
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  expiraEm   DateTime
+  criadaEm   DateTime @default(now())
+  ultimoUso  DateTime @default(now())
+
+  @@index([usuarioId])
+}

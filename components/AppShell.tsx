@@ -18,6 +18,7 @@ import { LogoMark, LogoHorizontal } from "@/components/LogoMark";
 import { MobileBrandBar } from "@/components/MobileBrandBar";
 import { CommandPalette } from "@/components/CommandPalette";
 import { SfxLayer } from "@/components/Sfx";
+import { BotaoSair } from "@/components/BotaoSair";
 
 const NAV = [
   { to: "/", label: "Coleção", icon: Boxes },
@@ -123,7 +124,8 @@ export function AppShell({
           })}
         </nav>
 
-        <div className="border-t border-border p-4">
+        <div className="space-y-1 border-t border-border p-4">
+          <BotaoSair />
           <button
             type="button"
             onClick={toggleCollapsed}

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { exigirSessao } from "@/lib/auth";
 import { NOT_DELETED } from "@/lib/queries";
 import { CSV_COLUMNS, toCsv } from "@/lib/csv";
 
@@ -6,6 +7,8 @@ export const dynamic = "force-dynamic";
 
 /** Backup da coleção em CSV — mesmo formato aceito pela importação. */
 export async function GET() {
+  await exigirSessao();
+
   const figures = await prisma.figure.findMany({
     where: NOT_DELETED,
     include: { marca: true, grupo: true, conjuntos: true },

@@ -8,9 +8,14 @@ import { createConjunto, updateConjunto, deleteConjunto } from "@/lib/actions/co
 import { BackupPanel } from "@/components/BackupPanel";
 import { Stagger, StaggerItem } from "@/components/motion";
 
+import { exigirSessao } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 export default async function ListasPage() {
+  // Checagem real de sessão: o proxy só confere presença de cookie.
+  await exigirSessao();
+
   const [marcas, grupos, conjuntos, options] = await Promise.all([
     prisma.marca.findMany({ orderBy: { ordem: "asc" } }),
     prisma.grupo.findMany({ orderBy: { ordem: "asc" } }),
