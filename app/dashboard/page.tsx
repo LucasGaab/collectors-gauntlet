@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CalendarClock, Trophy, Users } from "lucide-react";
+import { ArrowRight, CalendarClock, GalleryHorizontal, Trophy, Users } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { NOT_DELETED, WISHLIST_STATUSES, getMetas } from "@/lib/queries";
 import { getPreferencias } from "@/lib/preferencias";
@@ -23,7 +23,7 @@ export const dynamic = "force-dynamic";
 
 const brl = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
-/** Atalho para as telas derivadas do acervo (pódio, multiverso, preços). */
+/** Atalho para as telas fora da sidebar (pódio, multiverso, preços, vitrine). */
 function Atalho({
   href,
   titulo,
@@ -146,7 +146,7 @@ export default async function DashboardPage() {
         ))}
       </Stagger>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Atalho
           href="/podio"
           titulo="Pódio"
@@ -168,6 +168,12 @@ export default async function DashboardPage() {
               : `${defasados} ${defasados === 1 ? "peça" : "peças"} sem conferência há mais de ${MESES_ATE_DEFASAR} meses`
           }
           icone={CalendarClock}
+        />
+        <Atalho
+          href="/vitrine"
+          titulo="Vitrine pública"
+          descricao="A galeria que você compartilha com visitantes"
+          icone={GalleryHorizontal}
         />
       </div>
 

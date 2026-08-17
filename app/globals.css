@@ -91,15 +91,16 @@
   --color-chart-4: var(--chart-4);
   --color-chart-5: var(--chart-5);
 
-  /* aliases da paleta anterior, usados pelo código existente */
-  --color-base: var(--background);
-  --color-elevated: var(--surface);
-  --color-elevated2: var(--surface-high);
-  --color-subtle: var(--border);
-  --color-ink: var(--foreground);
-  --color-faint: var(--muted-foreground);
-  --color-marvel: var(--primary);
-  --color-marvel-hover: var(--primary-hover);
+  /*
+   * NÃO reintroduza aliases de cor com nomes curtos aqui.
+   *
+   * No Tailwind v4 todo token `--color-X` gera o utilitário `text-X`. Existia
+   * um `--color-base` legado (da paleta anterior) que transformava `text-base`
+   * — que todo mundo escreve achando que é tamanho de fonte — em "cor igual à
+   * do fundo". Resultado: texto invisível, contraste 1.0, sem nenhum erro.
+   * Os aliases estavam com uso zero e saíram. Um novo `--color-<palavra comum>`
+   * traria a mina de volta.
+   */
 
   --shadow-card: var(--shadow-card);
   --shadow-card-hover: var(--shadow-card-hover);
@@ -358,7 +359,9 @@ input[type="color"] {
 @utility caption-box {
   display: inline-block;
   background: var(--gold);
-  color: oklch(0.2 0.03 60);
+  /* Derivado do próprio fundo: `--gold` muda por tema (no Gama vira roxo), e
+     uma cor fixa de texto deixaria de contrastar em metade das paletas. */
+  color: color-mix(in oklab, var(--gold) 18%, #000);
   border: 3px solid #000;
   padding: 0.25rem 0.6rem;
   font-size: 0.65rem;

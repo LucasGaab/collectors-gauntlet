@@ -7,10 +7,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Boxes,
   CalendarClock,
+  GalleryHorizontal,
   Heart,
   LayoutDashboard,
   Plus,
   Search,
+  Settings,
   SlidersHorizontal,
   Trophy,
   Users,
@@ -35,7 +37,9 @@ const COMANDOS = [
   { label: "Pódio da coleção", href: "/podio", icon: Trophy },
   { label: "Multiverso dos personagens", href: "/personagens", icon: Users },
   { label: "Preços defasados", href: "/precos", icon: CalendarClock },
+  { label: "Vitrine pública", href: "/vitrine", icon: GalleryHorizontal },
   { label: "Listas auxiliares", href: "/listas", icon: SlidersHorizontal },
+  { label: "Preferências", href: "/preferencias", icon: Settings },
 ] as const;
 
 /**
